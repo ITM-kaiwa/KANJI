@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabaseClient";
 import { SAMPLE_KANJI } from "@/lib/sampleData";
 import { parsePyListString } from "@/lib/csvUtils";
-import type { KanjiEntry, KanjiFilter, KanjiLevel } from "@/lib/types";
+import { isKanaCategory, type KanjiEntry, type KanjiFilter, type KanjiLevel } from "@/lib/types";
 
 interface UseKanjiDataResult {
   allKanji: KanjiEntry[];
@@ -71,6 +71,16 @@ export function useKanjiData(filter: KanjiFilter): UseKanjiDataResult {
       setLoading(true);
       setError(null);
 
+      // Kana categories are served by useKanaData instead -- nothing to fetch here.
+      if (isKanaCategory(filter.level)) {
+        if (!cancelled) {
+          setAllKanji([]);
+          setUsingSampleData(false);
+          setLoading(false);
+        }
+        return;
+      }
+
       if (!isSupabaseConfigured || !supabase) {
         if (!cancelled) {
           setAllKanji(SAMPLE_KANJI);
@@ -80,16 +90,13 @@ export function useKanjiData(filter: KanjiFilter): UseKanjiDataResult {
         return;
       }
 
-      let query = supabase
+      const query = supabase
         .from("kanji_db")
         .select(
           "id, kanji, jlpt_level, on_yomi, kun_yomi, kan_viet, meaning_vn, REI1, REI2, REI3, REI4, unicode, japanese_on, vietnamese"
         )
-        .order("id", { ascending: true });
-
-      if (filter.level !== "ALL") {
-        query = query.eq("jlpt_level", filter.level);
-      }
+        .order("id", { ascending: true })
+        .eq("jlpt_level", filter.level);
 
       const { data, error: queryError } = await query;
 
@@ -117,7 +124,7 @@ export function useKanjiData(filter: KanjiFilter): UseKanjiDataResult {
   // client-side pass is only relevant when running on SAMPLE_KANJI (which is
   // N5-only, so it's a no-op unless filter.level is N4/N3).
   const filteredKanji = useMemo(() => {
-    if (filter.level === "ALL") return allKanji;
+    if (isKanaCategory(filter.level)) return [];
     return allKanji.filter((k) => k.jlpt_level === filter.level);
   }, [allKanji, filter.level]);
 

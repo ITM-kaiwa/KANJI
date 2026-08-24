@@ -10,13 +10,14 @@ interface FlashcardProps {
   onPrev: () => void;
   onNext: () => void;
   displayFields: DisplayFieldSettings;
+  onReview: (isCorrect: boolean) => void;
 }
 
 function readingOrDash(reading: string): string {
   return isNoReading(reading) ? "—" : reading;
 }
 
-export default function Flashcard({ kanji, onPrev, onNext, displayFields }: FlashcardProps) {
+export default function Flashcard({ kanji, onPrev, onNext, displayFields, onReview }: FlashcardProps) {
   const [flipped, setFlipped] = useState(false);
 
   // Always show the front face again when moving to a different card.
@@ -28,9 +29,14 @@ export default function Flashcard({ kanji, onPrev, onNext, displayFields }: Flas
     event.stopPropagation();
   }
 
+  function handleReview(isCorrect: boolean, event: React.MouseEvent) {
+    event.stopPropagation();
+    onReview(isCorrect);
+  }
+
   return (
     <div className="mx-auto w-full max-w-xl">
-      <div className="flip-perspective" style={{ height: 440 }}>
+      <div className="flip-perspective" style={{ height: 320 }}>
         <div className={`flip-inner ${flipped ? "is-flipped" : ""}`}>
           {/* ---------- FRONT ---------- */}
           <div
@@ -53,10 +59,10 @@ export default function Flashcard({ kanji, onPrev, onNext, displayFields }: Flas
               </span>
             )}
 
-            <div className="relative flex h-full flex-col items-center justify-center gap-5 px-16 py-6">
+            <div className="relative flex flex-1 flex-col items-center justify-center gap-3 px-16 py-3">
               <span
                 className="select-none font-kyokasho leading-none text-kanjibrown"
-                style={{ fontSize: "7rem" }}
+                style={{ fontSize: "5.5rem" }}
               >
                 {kanji.kanji}
               </span>
@@ -66,20 +72,20 @@ export default function Flashcard({ kanji, onPrev, onNext, displayFields }: Flas
                   <tbody>
                     {displayFields.onyomi && (
                       <tr className="border-b border-lemon-300/60">
-                        <td className="w-20 py-1.5 pr-2 text-right text-xs text-sand-500">
+                        <td className="w-20 py-1 pr-2 text-right text-xs text-sand-500">
                           音読み
                         </td>
-                        <td className="py-1.5 font-kyokasho text-base font-semibold text-black">
+                        <td className="py-1 font-kyokasho text-base font-semibold text-black">
                           {readingOrDash(kanji.on_yomi)}
                         </td>
                       </tr>
                     )}
                     {displayFields.kunyomi && (
                       <tr>
-                        <td className="w-20 py-1.5 pr-2 text-right text-xs text-sand-500">
+                        <td className="w-20 py-1 pr-2 text-right text-xs text-sand-500">
                           訓読み
                         </td>
-                        <td className="py-1.5 font-kyokasho text-base font-semibold text-black">
+                        <td className="py-1 font-kyokasho text-base font-semibold text-black">
                           {readingOrDash(kanji.kun_yomi)}
                         </td>
                       </tr>
@@ -88,6 +94,8 @@ export default function Flashcard({ kanji, onPrev, onNext, displayFields }: Flas
                 </table>
               )}
             </div>
+
+            <ReviewButtons onReview={handleReview} />
           </div>
 
           {/* ---------- BACK ---------- */}
@@ -101,9 +109,9 @@ export default function Flashcard({ kanji, onPrev, onNext, displayFields }: Flas
             <NavBand side="left" onClick={onPrev} />
             <NavBand side="right" onClick={onNext} />
 
-            <div className="relative flex h-full flex-col items-center justify-center gap-4 px-16 py-6">
+            <div className="relative flex flex-1 flex-col items-center justify-center gap-2 px-16 py-3">
               <div onClick={stop}>
-                <StrokeOrderAnimation character={kanji.kanji} active={flipped} size={200} />
+                <StrokeOrderAnimation character={kanji.kanji} active={flipped} size={150} />
               </div>
 
               {(displayFields.hanViet || displayFields.meaning) && (
@@ -133,9 +141,36 @@ export default function Flashcard({ kanji, onPrev, onNext, displayFields }: Flas
                 </table>
               )}
             </div>
+
+            <ReviewButtons onReview={handleReview} />
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+export function ReviewButtons({
+  onReview,
+}: {
+  onReview: (isCorrect: boolean, event: React.MouseEvent) => void;
+}) {
+  return (
+    <div className="flex shrink-0 gap-2 border-t border-lemon-300/60 px-16 py-2.5">
+      <button
+        type="button"
+        onClick={(event) => onReview(false, event)}
+        className="btn-press flex-1 rounded-xl bg-red-100 px-3 py-2 text-xs font-bold text-red-700 hover:bg-red-200 hover:brightness-95"
+      >
+        Chưa nhớ
+      </button>
+      <button
+        type="button"
+        onClick={(event) => onReview(true, event)}
+        className="btn-press flex-1 rounded-xl bg-leaf-200 px-3 py-2 text-xs font-bold text-kanjibrown hover:bg-leaf-300 hover:brightness-95"
+      >
+        Đã nhớ
+      </button>
     </div>
   );
 }

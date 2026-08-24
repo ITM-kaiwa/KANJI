@@ -53,7 +53,7 @@ export const DEFAULT_DISPLAY_FIELDS: DisplayFieldSettings = {
   meaning: true,
 };
 
-export type AppMode = "flashcard" | "quiz" | "radical";
+export type AppMode = "flashcard" | "quiz" | "radical" | "similar-grid" | "similar-choice";
 
 /** A verified hen (left component) + tsukuri (right component) pair that
  * combines into a real kanji. See lib/radicalGameData.ts. */
@@ -64,10 +64,27 @@ export interface RadicalCombo {
   level: Extract<KanjiLevel, "N5" | "N4">;
 }
 
+export type KanaType = "hiragana" | "katakana";
+
+/** The 5-way category selector: kanji by JLPT level, or one of the two kana sets. */
+export type ContentCategory = KanjiLevel | KanaType;
+
 export interface KanjiFilter {
-  level: KanjiLevel | "ALL";
+  level: ContentCategory;
 }
 
 export const DEFAULT_FILTER: KanjiFilter = {
-  level: "ALL",
+  level: "N5",
 };
+
+export function isKanaCategory(level: ContentCategory): level is KanaType {
+  return level === "hiragana" || level === "katakana";
+}
+
+export interface KanaEntry {
+  id: number;
+  character: string;
+  kanaType: KanaType;
+  romaji: string;
+  groupName: string;
+}

@@ -1,6 +1,6 @@
 "use client";
 
-import type { DisplayFieldSettings, KanjiEntry, KanjiFilter, KanjiLevel } from "@/lib/types";
+import type { ContentCategory, DisplayFieldSettings, KanjiEntry, KanjiFilter } from "@/lib/types";
 import { downloadRuledPaper } from "@/lib/pdf/ruledPaper";
 import { downloadKanjiList } from "@/lib/pdf/kanjiList";
 import { downloadPracticeSheet } from "@/lib/pdf/practiceSheet";
@@ -15,7 +15,13 @@ interface SettingsModalProps {
   kanjiForDownload: KanjiEntry[];
 }
 
-const LEVELS: Array<KanjiLevel | "ALL"> = ["ALL", "N5", "N4", "N3"];
+const CATEGORIES: Array<{ value: ContentCategory; label: string }> = [
+  { value: "hiragana", label: "ひらがな" },
+  { value: "katakana", label: "カタカナ" },
+  { value: "N5", label: "漢字 N5" },
+  { value: "N4", label: "漢字 N4" },
+  { value: "N3", label: "漢字 N3" },
+];
 
 export default function SettingsModal({
   open,
@@ -60,22 +66,25 @@ export default function SettingsModal({
               Lọc thẻ
             </h3>
 
-            <label className="block text-sm text-sand-700">
-              Cấp độ
-              <select
-                value={filter.level}
-                onChange={(e) =>
-                  onFilterChange({ ...filter, level: e.target.value as KanjiFilter["level"] })
-                }
-                className="mt-1 w-full rounded-lg border border-sand-300 bg-white px-3 py-2 text-sm text-sand-700 focus:border-sand-500 focus:outline-none"
-              >
-                {LEVELS.map((level) => (
-                  <option key={level} value={level}>
-                    {level === "ALL" ? "Tất cả cấp độ" : level}
-                  </option>
+            <div>
+              <span className="block text-sm text-sand-700">Danh mục</span>
+              <div className="mt-1.5 flex flex-wrap gap-1.5">
+                {CATEGORIES.map((cat) => (
+                  <button
+                    key={cat.value}
+                    type="button"
+                    onClick={() => onFilterChange({ ...filter, level: cat.value })}
+                    className={`btn-press rounded-full px-3.5 py-1.5 text-xs font-bold transition-colors ${
+                      filter.level === cat.value
+                        ? "bg-sand-600 text-sand-50 shadow"
+                        : "border border-sand-300 bg-white text-sand-700 hover:bg-sand-100"
+                    }`}
+                  >
+                    {cat.label}
+                  </button>
                 ))}
-              </select>
-            </label>
+              </div>
+            </div>
           </section>
 
           {/* --- Display fields --- */}
@@ -108,6 +117,27 @@ export default function SettingsModal({
                 label="Ý nghĩa"
                 checked={displayFields.meaning}
                 onChange={() => toggleField("meaning")}
+              />
+            </div>
+          </section>
+
+          {/* --- Kana notebooks --- */}
+          <section className="space-y-2">
+            <h3 className="text-xs font-semibold uppercase tracking-wide text-sand-500">
+              Vở luyện Kana
+            </h3>
+            <div className="flex flex-col gap-2">
+              <ExternalLinkButton
+                label="⬇ Vở luyện Hiragana"
+                href="https://drive.google.com/file/d/1TOjxvyL6RxNxN6zYsAhj338FLCD6v0-1/view?usp=sharing"
+              />
+              <ExternalLinkButton
+                label="⬇ Vở luyện Katakana"
+                href="https://drive.google.com/file/d/1O32toVYlvl9Mlf_Q4tbfhLegTR5eShE4/view?usp=drive_link"
+              />
+              <ExternalLinkButton
+                label="⬇ Bảng 50 âm (50音表)"
+                href="https://drive.google.com/file/d/1FqMJMkcz7ixNtZuPpxZBUomfoiENbg1x/view?usp=sharing"
               />
             </div>
           </section>
@@ -160,6 +190,19 @@ function CheckboxRow({
       />
       {label}
     </label>
+  );
+}
+
+function ExternalLinkButton({ label, href }: { label: string; href: string }) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="btn-press rounded-lg border border-sand-300 bg-white px-4 py-2 text-left text-sm font-medium text-sand-700 hover:bg-sand-100 hover:brightness-95"
+    >
+      {label}
+    </a>
   );
 }
 
