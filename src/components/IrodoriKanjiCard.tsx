@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { IrodoriKanjiEntry } from "@/lib/types";
+import type { DisplayFieldSettings, IrodoriKanjiEntry } from "@/lib/types";
 import SpeakButton from "./SpeakButton";
 import StrokeOrderAnimation from "./StrokeOrderAnimation";
 import { ReviewButtons } from "./Flashcard";
@@ -11,9 +11,16 @@ interface IrodoriKanjiCardProps {
   onPrev: () => void;
   onNext: () => void;
   onReview: (isCorrect: boolean) => void;
+  displayFields: DisplayFieldSettings;
 }
 
-export default function IrodoriKanjiCard({ entry, onPrev, onNext, onReview }: IrodoriKanjiCardProps) {
+export default function IrodoriKanjiCard({
+  entry,
+  onPrev,
+  onNext,
+  onReview,
+  displayFields,
+}: IrodoriKanjiCardProps) {
   const [flipped, setFlipped] = useState(false);
 
   useEffect(() => {
@@ -82,30 +89,36 @@ export default function IrodoriKanjiCard({ entry, onPrev, onNext, onReview }: Ir
 
               <table className="w-full flex-1 border-collapse text-left">
                 <tbody>
-                  <tr className="border-b border-lemon-300/60">
-                    <td className="w-16 py-1 pr-2 text-xs text-sand-600">読み方</td>
-                    <td className="py-1 font-kyokasho text-sm font-semibold text-black">
-                      {entry.reading}
-                    </td>
-                  </tr>
+                  {(displayFields.onyomi || displayFields.kunyomi) && (
+                    <tr className="border-b border-lemon-300/60">
+                      <td className="w-16 py-1 pr-2 text-xs text-sand-600">読み方</td>
+                      <td className="py-1 font-kyokasho text-sm font-semibold text-black">
+                        {entry.reading}
+                      </td>
+                    </tr>
+                  )}
                   <tr className="border-b border-lemon-300/60">
                     <td className="w-16 py-1 pr-2 text-xs text-sand-600">例</td>
                     <td className="py-1 font-kyokasho text-sm font-semibold text-black">
                       {entry.exampleWord}（{entry.exampleReading}）
                     </td>
                   </tr>
-                  <tr className="border-b border-lemon-300/60">
-                    <td className="w-16 py-1 pr-2 text-xs text-sand-600">Hán Việt</td>
-                    <td className="py-1 text-sm font-semibold italic text-black font-vietnamese">
-                      {entry.kanViet}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="w-16 py-1 pr-2 text-xs text-sand-600">Ý nghĩa</td>
-                    <td className="py-1 text-sm font-semibold text-black font-vietnamese">
-                      {entry.meaningVi}
-                    </td>
-                  </tr>
+                  {displayFields.hanViet && (
+                    <tr className="border-b border-lemon-300/60">
+                      <td className="w-16 py-1 pr-2 text-xs text-sand-600">Hán Việt</td>
+                      <td className="py-1 text-sm font-semibold italic text-black font-vietnamese">
+                        {entry.kanViet}
+                      </td>
+                    </tr>
+                  )}
+                  {displayFields.meaning && (
+                    <tr>
+                      <td className="w-16 py-1 pr-2 text-xs text-sand-600">Ý nghĩa</td>
+                      <td className="py-1 text-sm font-semibold text-black font-vietnamese">
+                        {entry.meaningVi}
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>

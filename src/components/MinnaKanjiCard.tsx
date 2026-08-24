@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { MinnaKanjiEntry } from "@/lib/types";
+import type { DisplayFieldSettings, MinnaKanjiEntry } from "@/lib/types";
 import SpeakButton from "./SpeakButton";
 import StrokeOrderAnimation from "./StrokeOrderAnimation";
 import { ReviewButtons } from "./Flashcard";
@@ -11,9 +11,16 @@ interface MinnaKanjiCardProps {
   onPrev: () => void;
   onNext: () => void;
   onReview: (isCorrect: boolean) => void;
+  displayFields: DisplayFieldSettings;
 }
 
-export default function MinnaKanjiCard({ entry, onPrev, onNext, onReview }: MinnaKanjiCardProps) {
+export default function MinnaKanjiCard({
+  entry,
+  onPrev,
+  onNext,
+  onReview,
+  displayFields,
+}: MinnaKanjiCardProps) {
   const [flipped, setFlipped] = useState(false);
 
   useEffect(() => {
@@ -49,7 +56,8 @@ export default function MinnaKanjiCard({ entry, onPrev, onNext, onReview }: Minn
             </div>
 
             <span className="absolute left-[4.25rem] top-4 z-10 rounded-full bg-white/70 px-2.5 py-0.5 text-[11px] font-semibold text-sand-600">
-              UNIT {entry.unit} ({entry.jlptLevel})
+              UNIT {entry.unit}
+              {displayFields.level ? ` (${entry.jlptLevel})` : ""}
             </span>
 
             <div className="relative flex flex-1 flex-col items-center justify-center gap-3 px-16 py-3">
@@ -60,28 +68,34 @@ export default function MinnaKanjiCard({ entry, onPrev, onNext, onReview }: Minn
                 {entry.kanji}
               </span>
 
-              <table className="w-full max-w-xs border-collapse text-center">
-                <tbody>
-                  <tr className="border-b border-lemon-300/60">
-                    <td className="w-20 py-1 pr-2 text-right align-middle text-xs leading-tight text-sand-600">
-                      <span className="block">音読み</span>
-                      <span className="block text-[10px] opacity-80">(ON-yomi)</span>
-                    </td>
-                    <td className="py-1 font-kyokasho text-base font-semibold text-black">
-                      {entry.onYomi}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="w-20 py-1 pr-2 text-right align-middle text-xs leading-tight text-sand-600">
-                      <span className="block">訓読み</span>
-                      <span className="block text-[10px] opacity-80">(Kun-yomi)</span>
-                    </td>
-                    <td className="py-1 font-kyokasho text-base font-semibold text-black">
-                      {entry.kunYomi}
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+              {(displayFields.onyomi || displayFields.kunyomi) && (
+                <table className="w-full max-w-xs border-collapse text-center">
+                  <tbody>
+                    {displayFields.onyomi && (
+                      <tr className="border-b border-lemon-300/60">
+                        <td className="w-20 py-1 pr-2 text-right align-middle text-xs leading-tight text-sand-600">
+                          <span className="block">音読み</span>
+                          <span className="block text-[10px] opacity-80">(ON-yomi)</span>
+                        </td>
+                        <td className="py-1 font-kyokasho text-base font-semibold text-black">
+                          {entry.onYomi}
+                        </td>
+                      </tr>
+                    )}
+                    {displayFields.kunyomi && (
+                      <tr>
+                        <td className="w-20 py-1 pr-2 text-right align-middle text-xs leading-tight text-sand-600">
+                          <span className="block">訓読み</span>
+                          <span className="block text-[10px] opacity-80">(Kun-yomi)</span>
+                        </td>
+                        <td className="py-1 font-kyokasho text-base font-semibold text-black">
+                          {entry.kunYomi}
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              )}
             </div>
 
             <ReviewButtons onReview={handleReview} />
@@ -103,20 +117,32 @@ export default function MinnaKanjiCard({ entry, onPrev, onNext, onReview }: Minn
                 <StrokeOrderAnimation character={entry.kanji} active={flipped} size={150} />
               </div>
 
-              <table className="w-full max-w-xs border-collapse text-center font-vietnamese">
-                <tbody>
-                  <tr className="border-b border-lemon-300/60">
-                    <td className="w-24 py-1.5 pr-2 text-right text-xs text-sand-600">Hán Việt</td>
-                    <td className="py-1.5 text-base font-semibold italic text-black">
-                      {entry.kanViet}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="w-24 py-1.5 pr-2 text-right text-xs text-sand-600">Ý nghĩa</td>
-                    <td className="py-1.5 text-base font-semibold text-black">{entry.meaningVi}</td>
-                  </tr>
-                </tbody>
-              </table>
+              {(displayFields.hanViet || displayFields.meaning) && (
+                <table className="w-full max-w-xs border-collapse text-center font-vietnamese">
+                  <tbody>
+                    {displayFields.hanViet && (
+                      <tr className="border-b border-lemon-300/60">
+                        <td className="w-24 py-1.5 pr-2 text-right text-xs text-sand-600">
+                          Hán Việt
+                        </td>
+                        <td className="py-1.5 text-base font-semibold italic text-black">
+                          {entry.kanViet}
+                        </td>
+                      </tr>
+                    )}
+                    {displayFields.meaning && (
+                      <tr>
+                        <td className="w-24 py-1.5 pr-2 text-right text-xs text-sand-600">
+                          Ý nghĩa
+                        </td>
+                        <td className="py-1.5 text-base font-semibold text-black">
+                          {entry.meaningVi}
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              )}
             </div>
 
             <ReviewButtons onReview={handleReview} />

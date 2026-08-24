@@ -119,6 +119,12 @@ export default function SettingsModal({
                     </button>
                   ))}
                 </div>
+                <div className="mt-2">
+                  <ExternalLinkButton
+                    label="↗ Đối nghĩa (対義語)"
+                    href="https://itm-kaiwa.github.io/adjective/"
+                  />
+                </div>
               </div>
             </div>
           </section>

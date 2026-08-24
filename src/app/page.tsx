@@ -224,6 +224,7 @@ export default function HomePage() {
               onPrev={goPrev}
               onNext={goNext}
               onReview={handleReview}
+              displayFields={displayFields}
             />
           </>
         )}
@@ -238,6 +239,7 @@ export default function HomePage() {
               onPrev={goPrev}
               onNext={goNext}
               onReview={handleReview}
+              displayFields={displayFields}
             />
           </>
         )}
