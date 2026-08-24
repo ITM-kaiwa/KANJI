@@ -72,7 +72,7 @@ export default function Flashcard({ kanji, onPrev, onNext, displayFields, onRevi
                   <tbody>
                     {displayFields.onyomi && (
                       <tr className="border-b border-lemon-300/60">
-                        <td className="w-20 py-1 pr-2 text-right align-middle text-xs leading-tight text-sand-500">
+                        <td className="w-20 py-1 pr-2 text-right align-middle text-xs leading-tight text-sand-600">
                           <span className="block">音読み</span>
                           <span className="block text-[10px] opacity-80">(ON-yomi)</span>
                         </td>
@@ -83,7 +83,7 @@ export default function Flashcard({ kanji, onPrev, onNext, displayFields, onRevi
                     )}
                     {displayFields.kunyomi && (
                       <tr>
-                        <td className="w-20 py-1 pr-2 text-right align-middle text-xs leading-tight text-sand-500">
+                        <td className="w-20 py-1 pr-2 text-right align-middle text-xs leading-tight text-sand-600">
                           <span className="block">訓読み</span>
                           <span className="block text-[10px] opacity-80">(Kun-yomi)</span>
                         </td>
@@ -121,7 +121,7 @@ export default function Flashcard({ kanji, onPrev, onNext, displayFields, onRevi
                   <tbody>
                     {displayFields.hanViet && (
                       <tr className="border-b border-lemon-300/60">
-                        <td className="w-24 py-1.5 pr-2 text-right text-xs text-sand-500">
+                        <td className="w-24 py-1.5 pr-2 text-right text-xs text-sand-600">
                           Hán Việt
                         </td>
                         <td className="py-1.5 text-base font-semibold italic text-black">
@@ -131,7 +131,7 @@ export default function Flashcard({ kanji, onPrev, onNext, displayFields, onRevi
                     )}
                     {displayFields.meaning && (
                       <tr>
-                        <td className="w-24 py-1.5 pr-2 text-right text-xs text-sand-500">
+                        <td className="w-24 py-1.5 pr-2 text-right text-xs text-sand-600">
                           Ý nghĩa
                         </td>
                         <td className="py-1.5 text-base font-semibold text-black">

@@ -110,7 +110,7 @@ export default function SimilarKanjiGridGame({ kanjiPool }: SimilarKanjiGridGame
       </div>
 
       <div className="rounded-3xl border border-lemon-300/70 bg-lemon-200 p-5 text-center shadow-card">
-        <p className="mb-2 text-xs uppercase tracking-wide text-sand-500">
+        <p className="mb-2 text-xs uppercase tracking-wide text-sand-600">
           Tìm đúng chữ này trong lưới 6x6
         </p>
         <span

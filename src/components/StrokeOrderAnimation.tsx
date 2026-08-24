@@ -86,7 +86,7 @@ export default function StrokeOrderAnimation({
         className="rounded-xl bg-white/40"
       />
       {loadError && (
-        <span className="text-center text-[11px] leading-tight text-sand-500">
+        <span className="text-center text-[11px] leading-tight text-sand-600">
           Không tải được dữ liệu nét chữ cho &quot;{character}&quot;.
         </span>
       )}

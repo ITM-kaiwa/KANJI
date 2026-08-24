@@ -123,7 +123,7 @@ export default function QuizMode({ kanjiPool }: QuizModeProps) {
       </div>
 
       <div className="rounded-3xl border border-lemon-300/70 bg-lemon-200 p-8 text-center shadow-card">
-        <p className="mb-4 text-xs uppercase tracking-wide text-sand-500">
+        <p className="mb-4 text-xs uppercase tracking-wide text-sand-600">
           Nghĩa của chữ Hán này là gì?
         </p>
         <span

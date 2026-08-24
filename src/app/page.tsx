@@ -138,17 +138,17 @@ export default function HomePage() {
 
       <main className="flex flex-1 flex-col items-center justify-center gap-4 px-4 py-8">
         {usingSampleData && kind === "kanji" && (
-          <p className="max-w-xl text-center text-xs text-sand-500">
+          <p className="max-w-xl text-center text-xs text-sand-600">
             Đang hiển thị dữ liệu mẫu cục bộ (chưa kết nối Supabase, hoặc bảng &quot;kanji_db&quot;
             không trả về dữ liệu). Xem README để kết nối cơ sở dữ liệu thật.
           </p>
         )}
 
-        {loading && <p className="text-sand-500">Đang tải dữ liệu…</p>}
+        {loading && <p className="text-sand-600">Đang tải dữ liệu…</p>}
 
         {!loading && mode === "flashcard" && kind === "kana" && currentKana && (
           <>
-            <p className="text-sm text-sand-500">
+            <p className="text-sm text-sand-600">
               Thẻ {safeIndex + 1}/{displayList.length} ({currentKana.groupName})
             </p>
             <KanaCard kana={currentKana} onPrev={goPrev} onNext={goNext} onReview={handleReview} />
@@ -157,7 +157,7 @@ export default function HomePage() {
 
         {!loading && mode === "flashcard" && kind === "vocab" && currentVocab && (
           <>
-            <p className="text-sm text-sand-500">
+            <p className="text-sm text-sand-600">
               Thẻ {safeIndex + 1}/{displayList.length} (Bài {currentVocab.lesson})
             </p>
             <VocabCard
@@ -171,7 +171,7 @@ export default function HomePage() {
 
         {!loading && mode === "flashcard" && kind === "kanji" && currentKanji && (
           <>
-            <p className="text-sm text-sand-500">
+            <p className="text-sm text-sand-600">
               Thẻ {safeIndex + 1}/{displayList.length} ({currentKanji.jlpt_level})
             </p>
             <Flashcard
@@ -185,7 +185,7 @@ export default function HomePage() {
         )}
 
         {!loading && mode === "flashcard" && displayList.length === 0 && (
-          <p className="text-sand-500">Không có thẻ nào phù hợp với bộ lọc hiện tại.</p>
+          <p className="text-sand-600">Không có thẻ nào phù hợp với bộ lọc hiện tại.</p>
         )}
 
         {!loading && mode === "quiz" && <QuizMode kanjiPool={filteredKanji} />}

@@ -209,7 +209,7 @@ export default function RadicalGame({ filter }: RadicalGameProps) {
       <div className="flex flex-col gap-4 rounded-3xl border border-lemon-300/70 bg-lemon-100 p-5 shadow-card sm:flex-row">
         {/* Falling zone */}
         <div className="relative mx-auto h-72 w-full max-w-[220px] shrink-0 overflow-hidden rounded-2xl border-2 border-dashed border-leaf-300 bg-lemon-200/60">
-          <p className="absolute left-0 right-0 top-2 text-center text-[11px] font-medium text-sand-500">
+          <p className="absolute left-0 right-0 top-2 text-center text-[11px] font-medium text-sand-600">
             {promptLabel}
           </p>
           <div
@@ -228,7 +228,7 @@ export default function RadicalGame({ filter }: RadicalGameProps) {
 
         {/* Candidate stock (right side) */}
         <div className="flex flex-1 flex-col gap-2">
-          <p className="text-center text-[11px] font-medium text-sand-500 sm:text-left">
+          <p className="text-center text-[11px] font-medium text-sand-600 sm:text-left">
             {candidateLabel} — nhấn thật nhanh trước khi thẻ rơi hết!
           </p>
           <div className="grid grid-cols-3 gap-2 sm:grid-cols-3">

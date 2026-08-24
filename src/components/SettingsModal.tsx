@@ -55,7 +55,7 @@ export default function SettingsModal({
             type="button"
             onClick={onClose}
             aria-label="Đóng"
-            className="btn-press flex h-7 w-7 items-center justify-center rounded-full text-sand-500 hover:bg-sand-200 hover:brightness-95"
+            className="btn-press flex h-7 w-7 items-center justify-center rounded-full text-sand-600 hover:bg-sand-200 hover:brightness-95"
           >
             ✕
           </button>
@@ -64,7 +64,7 @@ export default function SettingsModal({
         <div className="max-h-[70vh] space-y-6 overflow-y-auto px-5 py-5">
           {/* --- Filters --- */}
           <section className="space-y-3">
-            <h3 className="text-xs font-semibold uppercase leading-5 tracking-wide text-sand-500">
+            <h3 className="text-xs font-semibold uppercase leading-5 tracking-wide text-sand-600">
               Lọc thẻ
             </h3>
 
@@ -91,7 +91,7 @@ export default function SettingsModal({
 
           {/* --- Display fields --- */}
           <section className="space-y-2">
-            <h3 className="text-xs font-semibold uppercase leading-5 tracking-wide text-sand-500">
+            <h3 className="text-xs font-semibold uppercase leading-5 tracking-wide text-sand-600">
               Hiển thị trên thẻ
             </h3>
             <div className="grid grid-cols-2 gap-2">
@@ -125,7 +125,7 @@ export default function SettingsModal({
 
           {/* --- Kana notebooks --- */}
           <section className="space-y-2">
-            <h3 className="text-xs font-semibold uppercase leading-5 tracking-wide text-sand-500">
+            <h3 className="text-xs font-semibold uppercase leading-5 tracking-wide text-sand-600">
               Vở luyện Kana
             </h3>
             <div className="flex flex-col gap-2">
@@ -146,7 +146,7 @@ export default function SettingsModal({
 
           {/* --- Vocab notebook --- */}
           <section className="space-y-2">
-            <h3 className="text-xs font-semibold uppercase leading-5 tracking-wide text-sand-500">
+            <h3 className="text-xs font-semibold uppercase leading-5 tracking-wide text-sand-600">
               Vở từ vựng
             </h3>
             <ExternalLinkButton
@@ -157,7 +157,7 @@ export default function SettingsModal({
 
           {/* --- Downloads --- */}
           <section className="space-y-2">
-            <h3 className="text-xs font-semibold uppercase leading-5 tracking-wide text-sand-500">
+            <h3 className="text-xs font-semibold uppercase leading-5 tracking-wide text-sand-600">
               Tải xuống ({kanjiForDownload.length} chữ đang lọc)
             </h3>
             <div className="flex flex-col gap-2">
@@ -174,7 +174,7 @@ export default function SettingsModal({
                 onClick={() => downloadPracticeSheet(kanjiForDownload)}
               />
             </div>
-            <p className="pt-1 text-[11px] leading-snug text-sand-500">
+            <p className="pt-1 text-[11px] leading-snug text-sand-600">
               Mỗi nút sẽ mở hộp thoại in của trình duyệt — chọn “Save as PDF” để tải xuống.
             </p>
           </section>

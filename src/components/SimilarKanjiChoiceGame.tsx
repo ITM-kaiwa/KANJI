@@ -119,7 +119,7 @@ export default function SimilarKanjiChoiceGame({ kanjiPool }: SimilarKanjiChoice
       </div>
 
       <div className="rounded-3xl border border-lemon-300/70 bg-lemon-200 p-8 text-center shadow-card">
-        <p className="mb-4 text-xs uppercase tracking-wide text-sand-500">
+        <p className="mb-4 text-xs uppercase tracking-wide text-sand-600">
           Chọn đúng chữ Hán giống hệt chữ bên dưới
         </p>
         <span

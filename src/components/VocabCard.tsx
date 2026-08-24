@@ -62,7 +62,7 @@ export default function VocabCard({ vocab, onPrev, onNext, onReview }: VocabCard
                 <span className="font-kyokasho text-lg text-sand-600">({vocab.reading})</span>
               )}
               {vocab.romaji && (
-                <span className="text-base font-semibold text-sand-500">[{vocab.romaji}]</span>
+                <span className="text-base font-semibold text-sand-600">[{vocab.romaji}]</span>
               )}
             </div>
 
@@ -81,7 +81,7 @@ export default function VocabCard({ vocab, onPrev, onNext, onReview }: VocabCard
             <NavBand side="right" onClick={onNext} />
 
             <div className="relative flex flex-1 flex-col items-center justify-center gap-3 px-16 py-3 font-vietnamese">
-              <span className="text-xs uppercase tracking-wide text-sand-500">Nghĩa</span>
+              <span className="text-xs uppercase tracking-wide text-sand-600">Nghĩa</span>
               <span className="text-center text-2xl font-semibold text-black">{vocab.meaningVi}</span>
             </div>
 
