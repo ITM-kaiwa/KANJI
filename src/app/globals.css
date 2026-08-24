@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background-color: #f6f0e4; /* sand-100 */
+}
+
+/* --- Flashcard 3D flip --- */
+.flip-perspective {
+  perspective: 1600px;
+}
+
+.flip-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.5s cubic-bezier(0.4, 0.2, 0.2, 1);
+  transform-style: preserve-3d;
+}
+
+.flip-inner.is-flipped {
+  transform: rotateY(180deg);
+}
+
+.flip-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.flip-face-back {
+  transform: rotateY(180deg);
+}
+
+/* Pressed-in effect for buttons across the app. */
+.btn-press {
+  transition: transform 0.08s ease-out, filter 0.15s ease-out, background-color 0.15s ease-out;
+}
+.btn-press:active {
+  transform: scale(0.94);
+}

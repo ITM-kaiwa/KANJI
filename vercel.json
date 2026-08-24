@@ -1,0 +1,8 @@
+{
+  "functions": {
+    "api/tts.py": {
+      "memory": 512,
+      "maxDuration": 10
+    }
+  }
+}
