@@ -12,6 +12,17 @@ interface VocabCardProps {
   onReview: (isCorrect: boolean) => void;
 }
 
+/** Minna words are short (2-6 chars); Irodori entries can run much longer
+ * (e.g. "～しゅっしん（ちゅうごくしゅっしん）"), so scale the headword down
+ * to keep long entries from overflowing the fixed-height card. */
+function headwordFontSize(text: string): string {
+  const len = text.length;
+  if (len <= 6) return "3.25rem";
+  if (len <= 10) return "2.4rem";
+  if (len <= 16) return "1.8rem";
+  return "1.4rem";
+}
+
 export default function VocabCard({ vocab, onPrev, onNext, onReview }: VocabCardProps) {
   const [flipped, setFlipped] = useState(false);
   const isIrodori = vocab.source === "irodori";
@@ -62,8 +73,8 @@ export default function VocabCard({ vocab, onPrev, onNext, onReview }: VocabCard
 
             <div className="relative flex flex-1 flex-col items-center justify-center gap-2 px-16 py-3">
               <span
-                className="select-none font-kyokasho leading-none text-kanjibrown"
-                style={{ fontSize: "3.25rem" }}
+                className="select-none text-center font-kyokasho leading-tight text-kanjibrown"
+                style={{ fontSize: headwordFontSize(vocab.word) }}
               >
                 {vocab.word}
               </span>
@@ -92,8 +103,8 @@ export default function VocabCard({ vocab, onPrev, onNext, onReview }: VocabCard
             <div className="relative flex flex-1 flex-col items-center justify-center gap-3 px-16 py-3">
               {isIrodori && vocab.kanjiForm && (
                 <span
-                  className="select-none font-kyokasho leading-none text-kanjibrown"
-                  style={{ fontSize: "2.5rem" }}
+                  className="select-none text-center font-kyokasho leading-tight text-kanjibrown"
+                  style={{ fontSize: headwordFontSize(vocab.kanjiForm) }}
                 >
                   {vocab.kanjiForm}
                 </span>
