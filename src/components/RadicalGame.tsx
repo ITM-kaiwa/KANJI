@@ -9,7 +9,7 @@ interface RadicalGameProps {
 }
 
 const TOTAL_ROUNDS = 5;
-const FALL_DURATION_MS = 4200;
+const FALL_DURATION_MS = 6200;
 const MAX_CANDIDATES = 6;
 
 type Role = "hen" | "tsukuri";
