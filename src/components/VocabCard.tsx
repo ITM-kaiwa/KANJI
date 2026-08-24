@@ -14,6 +14,7 @@ interface VocabCardProps {
 
 export default function VocabCard({ vocab, onPrev, onNext, onReview }: VocabCardProps) {
   const [flipped, setFlipped] = useState(false);
+  const isIrodori = vocab.source === "irodori";
 
   useEffect(() => {
     setFlipped(false);
@@ -47,8 +48,16 @@ export default function VocabCard({ vocab, onPrev, onNext, onReview }: VocabCard
               <SpeakButton text={vocab.word} />
             </div>
 
+            {isIrodori && vocab.partOfSpeech && (
+              <span className="absolute right-[7.5rem] top-4 z-10 max-w-[7rem] truncate rounded-full bg-white/70 px-2.5 py-1 text-[11px] font-semibold text-sand-600">
+                {vocab.partOfSpeech}
+              </span>
+            )}
+
             <span className="absolute left-[4.25rem] top-4 z-10 rounded-full bg-white/70 px-2.5 py-0.5 text-[11px] font-semibold text-sand-600">
-              Bài {vocab.lesson} ({vocab.jlptLevel})
+              {isIrodori
+                ? `${vocab.bookLabel} 第${vocab.lesson}課`
+                : `Bài ${vocab.lesson} (${vocab.jlptLevel})`}
             </span>
 
             <div className="relative flex flex-1 flex-col items-center justify-center gap-2 px-16 py-3">
@@ -58,7 +67,7 @@ export default function VocabCard({ vocab, onPrev, onNext, onReview }: VocabCard
               >
                 {vocab.word}
               </span>
-              {vocab.reading !== vocab.word && (
+              {!isIrodori && vocab.reading !== vocab.word && (
                 <span className="font-kyokasho text-lg text-sand-600">({vocab.reading})</span>
               )}
               {vocab.romaji && (
@@ -80,9 +89,19 @@ export default function VocabCard({ vocab, onPrev, onNext, onReview }: VocabCard
             <NavBand side="left" onClick={onPrev} />
             <NavBand side="right" onClick={onNext} />
 
-            <div className="relative flex flex-1 flex-col items-center justify-center gap-3 px-16 py-3 font-vietnamese">
-              <span className="text-xs uppercase tracking-wide text-sand-600">Nghĩa</span>
-              <span className="text-center text-2xl font-semibold text-black">{vocab.meaningVi}</span>
+            <div className="relative flex flex-1 flex-col items-center justify-center gap-3 px-16 py-3">
+              {isIrodori && vocab.kanjiForm && (
+                <span
+                  className="select-none font-kyokasho leading-none text-kanjibrown"
+                  style={{ fontSize: "2.5rem" }}
+                >
+                  {vocab.kanjiForm}
+                </span>
+              )}
+              <span className="text-xs uppercase tracking-wide text-sand-600 font-vietnamese">Nghĩa</span>
+              <span className="text-center text-2xl font-semibold text-black font-vietnamese">
+                {vocab.meaningVi}
+              </span>
             </div>
 
             <ReviewButtons onReview={handleReview} />

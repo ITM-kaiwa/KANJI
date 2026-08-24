@@ -20,6 +20,7 @@ import { processReview, type ReviewContentType } from "@/lib/srs";
 import {
   DEFAULT_DISPLAY_FIELDS,
   DEFAULT_FILTER,
+  isIrodoriCategory,
   isKanaCategory,
   isVocabCategory,
   type AppMode,
@@ -40,7 +41,7 @@ function shuffle<T>(arr: T[]): T[] {
 
 function contentKindOf(level: KanjiFilter["level"]): ContentKind {
   if (isKanaCategory(level)) return "kana";
-  if (isVocabCategory(level)) return "vocab";
+  if (isVocabCategory(level) || isIrodoriCategory(level)) return "vocab";
   return "kanji";
 }
 
@@ -57,7 +58,7 @@ export default function HomePage() {
   const kind = contentKindOf(filter.level);
   const contentType: ReviewContentType = isKanaCategory(filter.level)
     ? filter.level
-    : isVocabCategory(filter.level)
+    : isVocabCategory(filter.level) || isIrodoriCategory(filter.level)
       ? "vocab"
       : "kanji";
 

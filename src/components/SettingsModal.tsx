@@ -23,6 +23,9 @@ const CATEGORIES: Array<{ value: ContentCategory; label: string }> = [
   { value: "N5", label: "漢字 N5" },
   { value: "N4", label: "漢字 N4" },
   { value: "N3", label: "漢字 N3" },
+  { value: "irodori-nyumon", label: "いろ入門" },
+  { value: "irodori-shokyu1", label: "いろ初級1" },
+  { value: "irodori-shokyu2", label: "いろ初級2" },
 ];
 
 export default function SettingsModal({

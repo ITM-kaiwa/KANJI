@@ -66,11 +66,15 @@ export interface RadicalCombo {
 
 export type KanaType = "hiragana" | "katakana";
 
-/** Vocabulary flashcards, split by "Minna no Nihongo" lesson range (1-25 = N5, 26-50 = N4). */
+/** "Minna no Nihongo" vocab, split by lesson range (1-25 = N5, 26-50 = N4). */
 export type VocabLevel = "vocab-n5" | "vocab-n4";
 
-/** The full category selector: kanji by JLPT level, kana, or vocab by level. */
-export type ContentCategory = KanjiLevel | KanaType | VocabLevel;
+/** "いろどり" (Irodori) vocab -- its own three categories, kept separate from
+ * the Minna no Nihongo N5/N4 pools rather than merged into them. */
+export type IrodoriLevel = "irodori-nyumon" | "irodori-shokyu1" | "irodori-shokyu2";
+
+/** The full category selector: kanji by JLPT level, kana, Minna vocab, or Irodori vocab. */
+export type ContentCategory = KanjiLevel | KanaType | VocabLevel | IrodoriLevel;
 
 export interface KanjiFilter {
   level: ContentCategory;
@@ -88,6 +92,10 @@ export function isVocabCategory(level: ContentCategory): level is VocabLevel {
   return level === "vocab-n5" || level === "vocab-n4";
 }
 
+export function isIrodoriCategory(level: ContentCategory): level is IrodoriLevel {
+  return level === "irodori-nyumon" || level === "irodori-shokyu1" || level === "irodori-shokyu2";
+}
+
 export interface KanaEntry {
   id: number;
   character: string;
@@ -95,6 +103,8 @@ export interface KanaEntry {
   romaji: string;
   groupName: string;
 }
+
+export type VocabSource = "minna" | "irodori";
 
 export interface VocabEntry {
   id: number;
@@ -104,4 +114,11 @@ export interface VocabEntry {
   reading: string;
   romaji: string;
   meaningVi: string;
+  source: VocabSource;
+  /** いろどり only: the kanji form, shown on the card back (front shows `word`, the kana reading). */
+  kanjiForm?: string;
+  /** いろどり only: part-of-speech badge text, e.g. "名詞（Noun）". */
+  partOfSpeech?: string;
+  /** いろどり only: book badge text, e.g. "いろどり入門". */
+  bookLabel?: string;
 }
