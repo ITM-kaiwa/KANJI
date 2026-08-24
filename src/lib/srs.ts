@@ -1,7 +1,7 @@
 import { supabase, isSupabaseConfigured } from "./supabaseClient";
 
 export type SrsStatus = "learning" | "reviewing" | "mastered";
-export type ReviewContentType = "kanji" | "hiragana" | "katakana";
+export type ReviewContentType = "kanji" | "hiragana" | "katakana" | "vocab";
 
 export interface SrsRecord {
   status: SrsStatus;

@@ -13,8 +13,9 @@ const kyokasho = BIZ_UDPMincho({
 });
 
 export const metadata: Metadata = {
-  title: "漢字学習アプリ",
-  description: "Kanji Học Tập App — flashcard & trắc nghiệm kanji JLPT N5-N3",
+  title: "日本語フラッシュカード",
+  description:
+    "Thẻ ghi nhớ tiếng Nhật — Kanji, Hiragana, Katakana, và từ vựng Minna no Nihongo N5-N4",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

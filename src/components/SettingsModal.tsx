@@ -18,6 +18,8 @@ interface SettingsModalProps {
 const CATEGORIES: Array<{ value: ContentCategory; label: string }> = [
   { value: "hiragana", label: "ひらがな" },
   { value: "katakana", label: "カタカナ" },
+  { value: "vocab-n5", label: "単語 N5" },
+  { value: "vocab-n4", label: "単語 N4" },
   { value: "N5", label: "漢字 N5" },
   { value: "N4", label: "漢字 N4" },
   { value: "N3", label: "漢字 N3" },
@@ -140,6 +142,17 @@ export default function SettingsModal({
                 href="https://drive.google.com/file/d/1FqMJMkcz7ixNtZuPpxZBUomfoiENbg1x/view?usp=sharing"
               />
             </div>
+          </section>
+
+          {/* --- Vocab notebook --- */}
+          <section className="space-y-2">
+            <h3 className="text-xs font-semibold uppercase tracking-wide text-sand-500">
+              Vở từ vựng
+            </h3>
+            <ExternalLinkButton
+              label="⬇ Từ vựng Minna no Nihongo (Bài 1-50)"
+              href="/downloads/Minna-no-Nihongo-Tu_Vung_50_Bai.pdf"
+            />
           </section>
 
           {/* --- Downloads --- */}

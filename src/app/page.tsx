@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Header from "@/components/Header";
 import Flashcard from "@/components/Flashcard";
 import KanaCard from "@/components/KanaCard";
+import VocabCard from "@/components/VocabCard";
 import QuizMode from "@/components/QuizMode";
 import RadicalGame from "@/components/RadicalGame";
 import SimilarKanjiGridGame from "@/components/SimilarKanjiGridGame";
@@ -12,6 +13,7 @@ import SettingsModal from "@/components/SettingsModal";
 import Footer from "@/components/Footer";
 import { useKanjiData } from "@/hooks/useKanjiData";
 import { useKanaData } from "@/hooks/useKanaData";
+import { useVocabData } from "@/hooks/useVocabData";
 import { useReviewState } from "@/hooks/useReviewState";
 import { getDeviceId } from "@/lib/deviceId";
 import { processReview, type ReviewContentType } from "@/lib/srs";
@@ -19,10 +21,13 @@ import {
   DEFAULT_DISPLAY_FIELDS,
   DEFAULT_FILTER,
   isKanaCategory,
+  isVocabCategory,
   type AppMode,
   type DisplayFieldSettings,
   type KanjiFilter,
 } from "@/lib/types";
+
+type ContentKind = "kanji" | "kana" | "vocab";
 
 function shuffle<T>(arr: T[]): T[] {
   const copy = [...arr];
@@ -31,6 +36,12 @@ function shuffle<T>(arr: T[]): T[] {
     [copy[i], copy[j]] = [copy[j], copy[i]];
   }
   return copy;
+}
+
+function contentKindOf(level: KanjiFilter["level"]): ContentKind {
+  if (isKanaCategory(level)) return "kana";
+  if (isVocabCategory(level)) return "vocab";
+  return "kanji";
 }
 
 export default function HomePage() {
@@ -44,19 +55,25 @@ export default function HomePage() {
   const [order, setOrder] = useState<number[]>([]);
   const [reviewRefreshKey, setReviewRefreshKey] = useState(0);
 
-  const kana = isKanaCategory(filter.level);
-  const contentType: ReviewContentType = isKanaCategory(filter.level) ? filter.level : "kanji";
+  const kind = contentKindOf(filter.level);
+  const contentType: ReviewContentType = isKanaCategory(filter.level)
+    ? filter.level
+    : isVocabCategory(filter.level)
+      ? "vocab"
+      : "kanji";
 
   const { filteredKanji, loading: kanjiLoading, usingSampleData } = useKanjiData(filter);
   const { filteredKana, loading: kanaLoading } = useKanaData(filter);
-  const loading = kana ? kanaLoading : kanjiLoading;
+  const { filteredVocab, loading: vocabLoading } = useVocabData(filter);
+  const loading = kind === "kana" ? kanaLoading : kind === "vocab" ? vocabLoading : kanjiLoading;
 
   const reviewMap = useReviewState(contentType, reviewRefreshKey);
 
   // Cards with a due (or never-reviewed) next_review sort first; shuffling
   // (below) overrides this with pure randomness.
   const prioritized = useMemo(() => {
-    const list: Array<{ id: number }> = kana ? filteredKana : filteredKanji;
+    const list: Array<{ id: number }> =
+      kind === "kana" ? filteredKana : kind === "vocab" ? filteredVocab : filteredKanji;
     const now = Date.now();
     return [...list].sort((a, b) => {
       const dueA = reviewMap[String(a.id)] ?? 0;
@@ -66,7 +83,7 @@ export default function HomePage() {
       if (isDueA !== isDueB) return isDueA ? -1 : 1;
       return dueA - dueB;
     });
-  }, [kana, filteredKana, filteredKanji, reviewMap]);
+  }, [kind, filteredKana, filteredVocab, filteredKanji, reviewMap]);
 
   // Reset to a fresh identity order whenever the underlying list changes
   // (filter switch, data load, etc).
@@ -74,12 +91,16 @@ export default function HomePage() {
     setOrder(prioritized.map((_, i) => i));
     setCardIndex(0);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [prioritized.length, kana, filter.level]);
+  }, [prioritized.length, kind, filter.level]);
 
   const displayList = order.map((i) => prioritized[i]).filter(Boolean);
   const safeIndex = displayList.length > 0 ? cardIndex % displayList.length : 0;
-  const currentKanji = kana ? undefined : (displayList[safeIndex] as (typeof filteredKanji)[number]);
-  const currentKana = kana ? (displayList[safeIndex] as (typeof filteredKana)[number]) : undefined;
+  const currentKanji =
+    kind === "kanji" ? (displayList[safeIndex] as (typeof filteredKanji)[number]) : undefined;
+  const currentKana =
+    kind === "kana" ? (displayList[safeIndex] as (typeof filteredKana)[number]) : undefined;
+  const currentVocab =
+    kind === "vocab" ? (displayList[safeIndex] as (typeof filteredVocab)[number]) : undefined;
 
   function handleFilterChange(next: KanjiFilter) {
     setFilter(next);
@@ -100,7 +121,7 @@ export default function HomePage() {
   }
 
   async function handleReview(isCorrect: boolean) {
-    const current = kana ? currentKana : currentKanji;
+    const current = currentKanji ?? currentKana ?? currentVocab;
     if (!current) return;
     const deviceId = getDeviceId();
     await processReview(deviceId, contentType, String(current.id), isCorrect);
@@ -118,7 +139,7 @@ export default function HomePage() {
       />
 
       <main className="flex flex-1 flex-col items-center justify-center gap-4 px-4 py-8">
-        {usingSampleData && !kana && (
+        {usingSampleData && kind === "kanji" && (
           <p className="max-w-xl text-center text-xs text-sand-500">
             Đang hiển thị dữ liệu mẫu cục bộ (chưa kết nối Supabase, hoặc bảng &quot;kanji_db&quot;
             không trả về dữ liệu). Xem README để kết nối cơ sở dữ liệu thật.
@@ -127,7 +148,7 @@ export default function HomePage() {
 
         {loading && <p className="text-sand-500">Đang tải dữ liệu…</p>}
 
-        {!loading && mode === "flashcard" && kana && currentKana && (
+        {!loading && mode === "flashcard" && kind === "kana" && currentKana && (
           <>
             <p className="text-sm text-sand-500">
               Thẻ {safeIndex + 1}/{displayList.length} ({currentKana.groupName})
@@ -136,7 +157,21 @@ export default function HomePage() {
           </>
         )}
 
-        {!loading && mode === "flashcard" && !kana && currentKanji && (
+        {!loading && mode === "flashcard" && kind === "vocab" && currentVocab && (
+          <>
+            <p className="text-sm text-sand-500">
+              Thẻ {safeIndex + 1}/{displayList.length} (Bài {currentVocab.lesson})
+            </p>
+            <VocabCard
+              vocab={currentVocab}
+              onPrev={goPrev}
+              onNext={goNext}
+              onReview={handleReview}
+            />
+          </>
+        )}
+
+        {!loading && mode === "flashcard" && kind === "kanji" && currentKanji && (
           <>
             <p className="text-sm text-sand-500">
               Thẻ {safeIndex + 1}/{displayList.length} ({currentKanji.jlpt_level})

@@ -15,7 +15,7 @@ export default function Header({ mode, onModeChange, onOpenSettings, onShuffle }
       <div className="flex flex-wrap items-center gap-3">
         {/* Title intentionally kept small per spec -- not the visual focus. */}
         <span className="text-sm font-medium tracking-wide text-sand-600">
-          漢字学習アプリ
+          日本語フラッシュカード
         </span>
 
         <div className="flex rounded-full bg-sand-200 p-1 shadow-inner">

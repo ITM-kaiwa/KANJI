@@ -1,7 +1,8 @@
-# 漢字学習アプリ (KANJI)
+# 日本語フラッシュカード (KANJI)
 
 Next.js 14 + TailwindCSS + Supabase + Edge TTS (Vercel Python Function) で
-新規実装した漢字学習アプリです。
+実装した日本語フラッシュカードアプリです。漢字・ひらがな・カタカナ・
+「みんなの日本語」単語（N5/N4）のフラッシュカードを1つのアプリで学習できます。
 
 - ローカル作業フォルダ想定: `C:\Users\Admin\.gemini\antigravity\KANJI`
 - GitHub: `https://github.com/ITM-kaiwa/KANJI`

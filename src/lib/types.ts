@@ -66,8 +66,11 @@ export interface RadicalCombo {
 
 export type KanaType = "hiragana" | "katakana";
 
-/** The 5-way category selector: kanji by JLPT level, or one of the two kana sets. */
-export type ContentCategory = KanjiLevel | KanaType;
+/** Vocabulary flashcards, split by "Minna no Nihongo" lesson range (1-25 = N5, 26-50 = N4). */
+export type VocabLevel = "vocab-n5" | "vocab-n4";
+
+/** The full category selector: kanji by JLPT level, kana, or vocab by level. */
+export type ContentCategory = KanjiLevel | KanaType | VocabLevel;
 
 export interface KanjiFilter {
   level: ContentCategory;
@@ -81,10 +84,24 @@ export function isKanaCategory(level: ContentCategory): level is KanaType {
   return level === "hiragana" || level === "katakana";
 }
 
+export function isVocabCategory(level: ContentCategory): level is VocabLevel {
+  return level === "vocab-n5" || level === "vocab-n4";
+}
+
 export interface KanaEntry {
   id: number;
   character: string;
   kanaType: KanaType;
   romaji: string;
   groupName: string;
+}
+
+export interface VocabEntry {
+  id: number;
+  jlptLevel: Extract<KanjiLevel, "N5" | "N4">;
+  lesson: number;
+  word: string;
+  reading: string;
+  romaji: string;
+  meaningVi: string;
 }
