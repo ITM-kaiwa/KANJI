@@ -101,32 +101,49 @@ export function useVocabData(filter: KanjiFilter): UseVocabDataResult {
         return;
       }
 
-      let query = supabase
-        .from("vocab_db")
-        .select(
-          "id, jlpt_level, lesson, word, reading, romaji, meaning_vi, source, kanji_form, part_of_speech, book_label"
-        )
-        .order("sort_order", { ascending: true });
+      // PostgREST caps each request at the project's max-rows setting (1000
+      // here), and the largest Irodori books (1189 / 1504 rows) exceed that
+      // -- so page through with .range() until a page comes back short.
+      const PAGE_SIZE = 1000;
+      const allRows: VocabDbRow[] = [];
+      let queryError: unknown = null;
 
-      if (isMinna) {
-        query = query
-          .eq("source", "minna")
-          .eq("jlpt_level", MINNA_LEVEL_MAP[filter.level as VocabLevel]);
-      } else {
-        query = query
-          .eq("source", "irodori")
-          .eq("book_label", IRODORI_BOOK_MAP[filter.level as IrodoriLevel]);
+      for (let page = 0; ; page++) {
+        let query = supabase
+          .from("vocab_db")
+          .select(
+            "id, jlpt_level, lesson, word, reading, romaji, meaning_vi, source, kanji_form, part_of_speech, book_label"
+          )
+          .order("sort_order", { ascending: true })
+          .range(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE - 1);
+
+        if (isMinna) {
+          query = query
+            .eq("source", "minna")
+            .eq("jlpt_level", MINNA_LEVEL_MAP[filter.level as VocabLevel]);
+        } else {
+          query = query
+            .eq("source", "irodori")
+            .eq("book_label", IRODORI_BOOK_MAP[filter.level as IrodoriLevel]);
+        }
+
+        const { data, error } = await query;
+        if (error) {
+          queryError = error;
+          break;
+        }
+        if (!data || data.length === 0) break;
+        allRows.push(...(data as VocabDbRow[]));
+        if (data.length < PAGE_SIZE) break;
       }
-
-      const { data, error } = await query;
 
       if (cancelled) return;
 
-      if (error || !data || data.length === 0) {
+      if (queryError || allRows.length === 0) {
         setAllVocab(SAMPLE_VOCAB);
         setUsingSampleData(true);
       } else {
-        setAllVocab((data as VocabDbRow[]).map(mapRow));
+        setAllVocab(allRows.map(mapRow));
         setUsingSampleData(false);
       }
       setLoading(false);
