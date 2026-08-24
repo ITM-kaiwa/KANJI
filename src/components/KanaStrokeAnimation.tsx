@@ -31,7 +31,10 @@ export default function KanaStrokeAnimation({ character, active, size = 220 }: K
       return;
     }
 
-    const hex = character.charCodeAt(0).toString(16).toLowerCase();
+    // File names use uppercase hex (u30A2.svg, not u30a2.svg) -- Windows dev
+    // is case-insensitive so a mismatch here goes unnoticed locally, but
+    // Vercel's Linux filesystem is case-sensitive and 404s on it.
+    const hex = character.charCodeAt(0).toString(16).toUpperCase();
     let cancelled = false;
 
     fetch(`/images/kana-strokes/u${hex}.svg`)
