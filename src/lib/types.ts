@@ -73,8 +73,17 @@ export type VocabLevel = "vocab-n5" | "vocab-n4";
  * the Minna no Nihongo N5/N4 pools rather than merged into them. */
 export type IrodoriLevel = "irodori-nyumon" | "irodori-shokyu1" | "irodori-shokyu2";
 
-/** The full category selector: kanji by JLPT level, kana, Minna vocab, or Irodori vocab. */
-export type ContentCategory = KanjiLevel | KanaType | VocabLevel | IrodoriLevel;
+/** "いろどり" required-kanji list -- four book-level categories, separate
+ * from both the Minna vocab pools and the plain N5/N4/N3 kanji_db pools. */
+export type IrodoriKanjiLevel =
+  | "irodori-kanji-nyumon"
+  | "irodori-kanji-shokyu1"
+  | "irodori-kanji-shokyu2"
+  | "irodori-kanji-shochukyu";
+
+/** The full category selector: kanji by JLPT level, kana, Minna vocab,
+ * Irodori vocab, or Irodori kanji. */
+export type ContentCategory = KanjiLevel | KanaType | VocabLevel | IrodoriLevel | IrodoriKanjiLevel;
 
 export interface KanjiFilter {
   level: ContentCategory;
@@ -94,6 +103,15 @@ export function isVocabCategory(level: ContentCategory): level is VocabLevel {
 
 export function isIrodoriCategory(level: ContentCategory): level is IrodoriLevel {
   return level === "irodori-nyumon" || level === "irodori-shokyu1" || level === "irodori-shokyu2";
+}
+
+export function isIrodoriKanjiCategory(level: ContentCategory): level is IrodoriKanjiLevel {
+  return (
+    level === "irodori-kanji-nyumon" ||
+    level === "irodori-kanji-shokyu1" ||
+    level === "irodori-kanji-shokyu2" ||
+    level === "irodori-kanji-shochukyu"
+  );
 }
 
 export interface KanaEntry {
@@ -121,4 +139,21 @@ export interface VocabEntry {
   partOfSpeech?: string;
   /** いろどり only: book badge text, e.g. "いろどり入門". */
   bookLabel?: string;
+}
+
+/** "いろどり" required-kanji list entry. Unlike KanjiEntry (kanji_db), the
+ * reading is a single free-form field (often with okurigana in parens, or
+ * "*特別な読み方" for irregular readings), and each row carries exactly one
+ * example word. kan_viet/meaning_vi are reused from kanji_db for kanji that
+ * already exist there, or newly curated for kanji unique to this list. */
+export interface IrodoriKanjiEntry {
+  id: number;
+  kanji: string;
+  reading: string;
+  exampleWord: string;
+  exampleReading: string;
+  bookLabel: string;
+  lesson: number;
+  kanViet: string;
+  meaningVi: string;
 }

@@ -23,9 +23,17 @@ const CATEGORIES: Array<{ value: ContentCategory; label: string }> = [
   { value: "N5", label: "漢字 N5" },
   { value: "N4", label: "漢字 N4" },
   { value: "N3", label: "漢字 N3" },
+];
+
+/** Kept in their own bordered box, apart from the categories above. */
+const IRODORI_CATEGORIES: Array<{ value: ContentCategory; label: string }> = [
   { value: "irodori-nyumon", label: "いろ入門" },
   { value: "irodori-shokyu1", label: "いろ初級1" },
   { value: "irodori-shokyu2", label: "いろ初級2" },
+  { value: "irodori-kanji-nyumon", label: "いろ漢-入門" },
+  { value: "irodori-kanji-shokyu1", label: "いろ漢-初級1" },
+  { value: "irodori-kanji-shokyu2", label: "いろ漢-初級2" },
+  { value: "irodori-kanji-shochukyu", label: "いろ漢-初中級" },
 ];
 
 export default function SettingsModal({
@@ -88,6 +96,28 @@ export default function SettingsModal({
                     {cat.label}
                   </button>
                 ))}
+              </div>
+
+              <div className="mt-3 rounded-xl border-2 border-dashed border-leaf-400/70 bg-leaf-100/40 p-2.5">
+                <span className="mb-1.5 block text-[11px] font-bold uppercase tracking-wide text-leaf-400">
+                  いろどり
+                </span>
+                <div className="flex flex-wrap gap-1.5">
+                  {IRODORI_CATEGORIES.map((cat) => (
+                    <button
+                      key={cat.value}
+                      type="button"
+                      onClick={() => onFilterChange({ ...filter, level: cat.value })}
+                      className={`btn-press rounded-full px-3.5 py-1.5 text-xs font-bold transition-colors ${
+                        filter.level === cat.value
+                          ? "bg-sand-600 text-sand-50 shadow"
+                          : "border border-sand-300 bg-white text-sand-700 hover:bg-sand-100"
+                      }`}
+                    >
+                      {cat.label}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
           </section>
