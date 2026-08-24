@@ -9,7 +9,6 @@ interface SimilarKanjiGridGameProps {
 }
 
 const GRID_SIZE = 36;
-const TOTAL_ROUNDS = 5;
 
 interface Round {
   target: KanjiEntry;
@@ -17,10 +16,12 @@ interface Round {
   correctCell: number;
 }
 
+// One round per eligible kanji (matches QuizMode / SimilarKanjiChoiceGame,
+// which both run through the full pool instead of an arbitrary cap).
 function buildRounds(pool: KanjiEntry[]): Round[] {
   const eligible = pool.filter((k) => getSimilarKanji(k.kanji).length > 0);
   const shuffled = [...eligible].sort(() => Math.random() - 0.5);
-  return shuffled.slice(0, TOTAL_ROUNDS).map((target) => ({
+  return shuffled.map((target) => ({
     target,
     decoy: getSimilarKanji(target.kanji)[0],
     correctCell: Math.floor(Math.random() * GRID_SIZE),

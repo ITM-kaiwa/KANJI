@@ -27,11 +27,18 @@ function buildQuestions(pool: KanjiEntry[]): Question[] {
   const otherKanji = pool.map((k) => k.kanji);
 
   return shuffle(eligible).map((target) => {
-    const similar = getSimilarKanji(target.kanji);
-    const decoyPool = shuffle(
-      Array.from(new Set([...similar, ...shuffle(otherKanji)])).filter((c) => c !== target.kanji)
+    // Curated look-alikes always come first; only fall back to random
+    // filler from the pool if a kanji has fewer than 3 curated matches.
+    const similar = Array.from(new Set(getSimilarKanji(target.kanji))).filter(
+      (c) => c !== target.kanji
     );
-    const decoys = decoyPool.slice(0, 3);
+    let decoys = shuffle(similar).slice(0, 3);
+    if (decoys.length < 3) {
+      const filler = shuffle(otherKanji).filter(
+        (c) => c !== target.kanji && !decoys.includes(c)
+      );
+      decoys = [...decoys, ...filler].slice(0, 3);
+    }
     return { target, choices: shuffle([target.kanji, ...decoys]) };
   });
 }
