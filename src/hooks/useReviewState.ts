@@ -10,10 +10,14 @@ type ReviewMap = Record<string, number>;
 
 /**
  * Loads this device's review_state rows for a content type, so the caller
- * can sort due cards (next_review <= now) first. Re-fetches whenever
- * `refreshKey` changes (bump it after a review is recorded).
+ * can sort due cards (next_review <= now) first. Only re-fetches when
+ * `contentType` changes (i.e. switching category) -- deliberately NOT
+ * refetched after every review, since re-sorting the deck underneath the
+ * user mid-session makes "Next" jump to an unexpected card. Due-priority
+ * is meant to decide what a fresh session opens with, not to live-reorder
+ * an in-progress one.
  */
-export function useReviewState(contentType: ReviewContentType, refreshKey: number): ReviewMap {
+export function useReviewState(contentType: ReviewContentType): ReviewMap {
   const [map, setMap] = useState<ReviewMap>({});
 
   useEffect(() => {
@@ -43,7 +47,7 @@ export function useReviewState(contentType: ReviewContentType, refreshKey: numbe
     return () => {
       cancelled = true;
     };
-  }, [contentType, refreshKey]);
+  }, [contentType]);
 
   return map;
 }

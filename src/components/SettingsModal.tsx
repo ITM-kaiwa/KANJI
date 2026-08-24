@@ -64,7 +64,7 @@ export default function SettingsModal({
         <div className="max-h-[70vh] space-y-6 overflow-y-auto px-5 py-5">
           {/* --- Filters --- */}
           <section className="space-y-3">
-            <h3 className="text-xs font-semibold uppercase tracking-wide text-sand-500">
+            <h3 className="text-xs font-semibold uppercase leading-5 tracking-wide text-sand-500">
               Lọc thẻ
             </h3>
 
@@ -91,7 +91,7 @@ export default function SettingsModal({
 
           {/* --- Display fields --- */}
           <section className="space-y-2">
-            <h3 className="text-xs font-semibold uppercase tracking-wide text-sand-500">
+            <h3 className="text-xs font-semibold uppercase leading-5 tracking-wide text-sand-500">
               Hiển thị trên thẻ
             </h3>
             <div className="grid grid-cols-2 gap-2">
@@ -125,7 +125,7 @@ export default function SettingsModal({
 
           {/* --- Kana notebooks --- */}
           <section className="space-y-2">
-            <h3 className="text-xs font-semibold uppercase tracking-wide text-sand-500">
+            <h3 className="text-xs font-semibold uppercase leading-5 tracking-wide text-sand-500">
               Vở luyện Kana
             </h3>
             <div className="flex flex-col gap-2">
@@ -146,7 +146,7 @@ export default function SettingsModal({
 
           {/* --- Vocab notebook --- */}
           <section className="space-y-2">
-            <h3 className="text-xs font-semibold uppercase tracking-wide text-sand-500">
+            <h3 className="text-xs font-semibold uppercase leading-5 tracking-wide text-sand-500">
               Vở từ vựng
             </h3>
             <ExternalLinkButton
@@ -157,7 +157,7 @@ export default function SettingsModal({
 
           {/* --- Downloads --- */}
           <section className="space-y-2">
-            <h3 className="text-xs font-semibold uppercase tracking-wide text-sand-500">
+            <h3 className="text-xs font-semibold uppercase leading-5 tracking-wide text-sand-500">
               Tải xuống ({kanjiForDownload.length} chữ đang lọc)
             </h3>
             <div className="flex flex-col gap-2">

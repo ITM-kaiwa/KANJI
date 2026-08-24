@@ -53,7 +53,6 @@ export default function HomePage() {
   );
   const [cardIndex, setCardIndex] = useState(0);
   const [order, setOrder] = useState<number[]>([]);
-  const [reviewRefreshKey, setReviewRefreshKey] = useState(0);
 
   const kind = contentKindOf(filter.level);
   const contentType: ReviewContentType = isKanaCategory(filter.level)
@@ -67,7 +66,7 @@ export default function HomePage() {
   const { filteredVocab, loading: vocabLoading } = useVocabData(filter);
   const loading = kind === "kana" ? kanaLoading : kind === "vocab" ? vocabLoading : kanjiLoading;
 
-  const reviewMap = useReviewState(contentType, reviewRefreshKey);
+  const reviewMap = useReviewState(contentType);
 
   // Cards with a due (or never-reviewed) next_review sort first; shuffling
   // (below) overrides this with pure randomness.
@@ -125,7 +124,6 @@ export default function HomePage() {
     if (!current) return;
     const deviceId = getDeviceId();
     await processReview(deviceId, contentType, String(current.id), isCorrect);
-    setReviewRefreshKey((k) => k + 1);
     goNext();
   }
 
