@@ -6,6 +6,7 @@ import Flashcard from "@/components/Flashcard";
 import KanaCard from "@/components/KanaCard";
 import VocabCard from "@/components/VocabCard";
 import IrodoriKanjiCard from "@/components/IrodoriKanjiCard";
+import MinnaKanjiCard from "@/components/MinnaKanjiCard";
 import QuizMode from "@/components/QuizMode";
 import RadicalGame from "@/components/RadicalGame";
 import SimilarKanjiGridGame from "@/components/SimilarKanjiGridGame";
@@ -16,6 +17,7 @@ import { useKanjiData } from "@/hooks/useKanjiData";
 import { useKanaData } from "@/hooks/useKanaData";
 import { useVocabData } from "@/hooks/useVocabData";
 import { useIrodoriKanjiData } from "@/hooks/useIrodoriKanjiData";
+import { useMinnaKanjiData } from "@/hooks/useMinnaKanjiData";
 import { useReviewState } from "@/hooks/useReviewState";
 import { getDeviceId } from "@/lib/deviceId";
 import { processReview, type ReviewContentType } from "@/lib/srs";
@@ -25,13 +27,14 @@ import {
   isIrodoriCategory,
   isIrodoriKanjiCategory,
   isKanaCategory,
+  isMinnaKanjiCategory,
   isVocabCategory,
   type AppMode,
   type DisplayFieldSettings,
   type KanjiFilter,
 } from "@/lib/types";
 
-type ContentKind = "kanji" | "kana" | "vocab" | "irodori-kanji";
+type ContentKind = "kanji" | "kana" | "vocab" | "irodori-kanji" | "minna-kanji";
 
 function shuffle<T>(arr: T[]): T[] {
   const copy = [...arr];
@@ -45,6 +48,7 @@ function shuffle<T>(arr: T[]): T[] {
 function contentKindOf(level: KanjiFilter["level"]): ContentKind {
   if (isKanaCategory(level)) return "kana";
   if (isIrodoriKanjiCategory(level)) return "irodori-kanji";
+  if (isMinnaKanjiCategory(level)) return "minna-kanji";
   if (isVocabCategory(level) || isIrodoriCategory(level)) return "vocab";
   return "kanji";
 }
@@ -70,6 +74,7 @@ export default function HomePage() {
   const { filteredKana, loading: kanaLoading } = useKanaData(filter);
   const { filteredVocab, loading: vocabLoading } = useVocabData(filter);
   const { filteredIrodoriKanji, loading: irodoriKanjiLoading } = useIrodoriKanjiData(filter);
+  const { filteredMinnaKanji, loading: minnaKanjiLoading } = useMinnaKanjiData(filter);
   const loading =
     kind === "kana"
       ? kanaLoading
@@ -77,7 +82,9 @@ export default function HomePage() {
         ? vocabLoading
         : kind === "irodori-kanji"
           ? irodoriKanjiLoading
-          : kanjiLoading;
+          : kind === "minna-kanji"
+            ? minnaKanjiLoading
+            : kanjiLoading;
 
   const reviewMap = useReviewState(contentType);
 
@@ -91,7 +98,9 @@ export default function HomePage() {
           ? filteredVocab
           : kind === "irodori-kanji"
             ? filteredIrodoriKanji
-            : filteredKanji;
+            : kind === "minna-kanji"
+              ? filteredMinnaKanji
+              : filteredKanji;
     const now = Date.now();
     return [...list].sort((a, b) => {
       const dueA = reviewMap[String(a.id)] ?? 0;
@@ -101,7 +110,15 @@ export default function HomePage() {
       if (isDueA !== isDueB) return isDueA ? -1 : 1;
       return dueA - dueB;
     });
-  }, [kind, filteredKana, filteredVocab, filteredIrodoriKanji, filteredKanji, reviewMap]);
+  }, [
+    kind,
+    filteredKana,
+    filteredVocab,
+    filteredIrodoriKanji,
+    filteredMinnaKanji,
+    filteredKanji,
+    reviewMap,
+  ]);
 
   // Reset to a fresh identity order whenever the underlying list changes
   // (filter switch, data load, etc).
@@ -123,6 +140,10 @@ export default function HomePage() {
     kind === "irodori-kanji"
       ? (displayList[safeIndex] as (typeof filteredIrodoriKanji)[number])
       : undefined;
+  const currentMinnaKanji =
+    kind === "minna-kanji"
+      ? (displayList[safeIndex] as (typeof filteredMinnaKanji)[number])
+      : undefined;
 
   function handleFilterChange(next: KanjiFilter) {
     setFilter(next);
@@ -143,7 +164,8 @@ export default function HomePage() {
   }
 
   async function handleReview(isCorrect: boolean) {
-    const current = currentKanji ?? currentKana ?? currentVocab ?? currentIrodoriKanji;
+    const current =
+      currentKanji ?? currentKana ?? currentVocab ?? currentIrodoriKanji ?? currentMinnaKanji;
     if (!current) return;
     const deviceId = getDeviceId();
     await processReview(deviceId, contentType, String(current.id), isCorrect);
@@ -199,6 +221,20 @@ export default function HomePage() {
             </p>
             <IrodoriKanjiCard
               entry={currentIrodoriKanji}
+              onPrev={goPrev}
+              onNext={goNext}
+              onReview={handleReview}
+            />
+          </>
+        )}
+
+        {!loading && mode === "flashcard" && kind === "minna-kanji" && currentMinnaKanji && (
+          <>
+            <p className="text-sm text-sand-600">
+              Thẻ {safeIndex + 1}/{displayList.length} (UNIT {currentMinnaKanji.unit})
+            </p>
+            <MinnaKanjiCard
+              entry={currentMinnaKanji}
               onPrev={goPrev}
               onNext={goNext}
               onReview={handleReview}

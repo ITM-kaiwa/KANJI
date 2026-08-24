@@ -23,6 +23,7 @@ const CATEGORIES: Array<{ value: ContentCategory; label: string }> = [
   { value: "N5", label: "漢字 N5" },
   { value: "N4", label: "漢字 N4" },
   { value: "N3", label: "漢字 N3" },
+  { value: "minna-kanji", label: "みん漢字" },
 ];
 
 /** Kept in their own bordered box, apart from the categories above. */

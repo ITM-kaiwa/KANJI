@@ -81,9 +81,20 @@ export type IrodoriKanjiLevel =
   | "irodori-kanji-shokyu2"
   | "irodori-kanji-shochukyu";
 
+/** "Minna no Nihongo" required-kanji list -- a single category (unlike the
+ * Minna vocab pools, this isn't split N5/N4; both levels share one button
+ * per the user's request, kept separate from kanji_db's plain N5/N4/N3). */
+export type MinnaKanjiLevel = "minna-kanji";
+
 /** The full category selector: kanji by JLPT level, kana, Minna vocab,
- * Irodori vocab, or Irodori kanji. */
-export type ContentCategory = KanjiLevel | KanaType | VocabLevel | IrodoriLevel | IrodoriKanjiLevel;
+ * Minna kanji, Irodori vocab, or Irodori kanji. */
+export type ContentCategory =
+  | KanjiLevel
+  | KanaType
+  | VocabLevel
+  | IrodoriLevel
+  | IrodoriKanjiLevel
+  | MinnaKanjiLevel;
 
 export interface KanjiFilter {
   level: ContentCategory;
@@ -112,6 +123,10 @@ export function isIrodoriKanjiCategory(level: ContentCategory): level is Irodori
     level === "irodori-kanji-shokyu2" ||
     level === "irodori-kanji-shochukyu"
   );
+}
+
+export function isMinnaKanjiCategory(level: ContentCategory): level is MinnaKanjiLevel {
+  return level === "minna-kanji";
 }
 
 export interface KanaEntry {
@@ -154,6 +169,21 @@ export interface IrodoriKanjiEntry {
   exampleReading: string;
   bookLabel: string;
   lesson: number;
+  kanViet: string;
+  meaningVi: string;
+}
+
+/** "Minna no Nihongo" required-kanji list entry (UNIT1-50, minus a few
+ * skipped unit numbers in the source list). on_yomi/kun_yomi/kan_viet/
+ * meaning_vi all came pre-filled in the source CSV, unlike the Irodori
+ * kanji list which needed cross-referencing/new data. */
+export interface MinnaKanjiEntry {
+  id: number;
+  kanji: string;
+  onYomi: string;
+  kunYomi: string;
+  jlptLevel: Extract<KanjiLevel, "N5" | "N4">;
+  unit: number;
   kanViet: string;
   meaningVi: string;
 }
