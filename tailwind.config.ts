@@ -41,9 +41,17 @@ const config: Config = {
         },
       },
       fontFamily: {
-        // Approximates Japanese textbook print (kyoukasho-tai): BIZ UDPMincho
-        // is Morisawa's UD font family explicitly modeled on textbook fonts.
-        kyokasho: ["var(--font-kyokasho)", "serif"],
+        // True "教科書体" (UD Digital Kyokasho) ships with Windows 10/11 but
+        // isn't distributable as a webfont, so we prefer it locally when
+        // present and fall back to BIZ UDPMincho (Morisawa's UD font
+        // explicitly modeled on textbook print) for everyone else.
+        kyokasho: [
+          '"UD デジタル 教科書体 N-R"',
+          '"UDDigiKyokashoN-R"',
+          '"UD Digital Kyokasho NK-R"',
+          "var(--font-kyokasho)",
+          "serif",
+        ],
         vietnamese: ['"Times New Roman"', "Times", "serif"],
       },
       boxShadow: {
