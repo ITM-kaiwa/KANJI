@@ -72,8 +72,8 @@ export default function Flashcard({ kanji, onPrev, onNext, displayFields, onRevi
                   <tbody>
                     {displayFields.onyomi && (
                       <tr className="border-b border-lemon-300/60">
-                        <td className="w-20 py-1 pr-2 text-right text-xs text-sand-500">
-                          音読み
+                        <td className="w-28 py-1 pr-2 text-right text-xs text-sand-500">
+                          音読み（ON-yomi）
                         </td>
                         <td className="py-1 font-kyokasho text-base font-semibold text-black">
                           {readingOrDash(kanji.on_yomi)}
@@ -82,8 +82,8 @@ export default function Flashcard({ kanji, onPrev, onNext, displayFields, onRevi
                     )}
                     {displayFields.kunyomi && (
                       <tr>
-                        <td className="w-20 py-1 pr-2 text-right text-xs text-sand-500">
-                          訓読み
+                        <td className="w-28 py-1 pr-2 text-right text-xs text-sand-500">
+                          訓読み（Kun-yomi）
                         </td>
                         <td className="py-1 font-kyokasho text-base font-semibold text-black">
                           {readingOrDash(kanji.kun_yomi)}

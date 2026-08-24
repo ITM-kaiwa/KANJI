@@ -41,14 +41,21 @@ const config: Config = {
         },
       },
       fontFamily: {
-        // True "教科書体" (UD Digital Kyokasho) ships with Windows 10/11 but
-        // isn't distributable as a webfont, so we prefer it locally when
-        // present and fall back to BIZ UDPMincho (Morisawa's UD font
-        // explicitly modeled on textbook print) for everyone else.
+        // Real "教科書体" fonts (bundled with Windows/Office, not
+        // distributable as webfonts) are tried first, in rough order of how
+        // common they are on Japanese-locale machines; BIZ UDPMincho (a
+        // webfont explicitly modeled on textbook print) is the universal
+        // fallback for devices with none of them installed. Used for every
+        // kanji/kana headword across Flashcard, KanaCard, and VocabCard so
+        // the "教科書体最優先" rule applies consistently everywhere.
         kyokasho: [
           '"UD デジタル 教科書体 N-R"',
           '"UDDigiKyokashoN-R"',
           '"UD Digital Kyokasho NK-R"',
+          '"HGS教科書体"',
+          '"HG教科書体"',
+          '"游教科書体"',
+          '"YuKyokasho Yoko"',
           "var(--font-kyokasho)",
           "serif",
         ],
