@@ -21,6 +21,11 @@ export const RADICAL_COMBOS: RadicalCombo[] = [
   { hen: "亻", tsukuri: "弋", result: "代", level: "N4" },
   { hen: "亻", tsukuri: "昔", result: "借", level: "N4" },
   { hen: "木", tsukuri: "交", result: "校", level: "N5" },
+  // 木 itself is already used as a tsukuri elsewhere (亻+木=休), so it gets
+  // offered as a decoy for the 木 hen too -- without this entry that
+  // collision was marked wrong even though 木+木=林 is a real kanji (not in
+  // kanji_db, so it's exempt from the "must resolve to N5/N4" rule above).
+  { hen: "木", tsukuri: "木", result: "林", level: "N4" },
   { hen: "氵", tsukuri: "每", result: "海", level: "N4" },
   { hen: "氵", tsukuri: "主", result: "注", level: "N4" },
   { hen: "氵", tsukuri: "羊", result: "洋", level: "N4" },
