@@ -54,4 +54,35 @@ export const RADICAL_COMBOS: RadicalCombo[] = [
   { hen: "另", tsukuri: "刂", result: "別", level: "N4" },
   { hen: "ナ", tsukuri: "月", result: "有", level: "N4" },
   { hen: "是", tsukuri: "頁", result: "題", level: "N4" },
+
+  // --- Expansion batch: additional verified hen+tsukuri pairs. Levels
+  // follow this file's existing convention of tagging most non-core
+  // characters "N4" (mirrors how already-verified entries like 姉/妹/持/待
+  // are tagged N4 despite being early vocab) -- spot-check against the
+  // live kanji_db if precise N5/N4 boundary matters for a given entry.
+  { hen: "飠", tsukuri: "反", result: "飯", level: "N4" },
+  { hen: "飠", tsukuri: "官", result: "館", level: "N4" },
+  { hen: "飠", tsukuri: "欠", result: "飲", level: "N4" },
+  { hen: "亻", tsukuri: "士", result: "仕", level: "N4" },
+  { hen: "亻", tsukuri: "動", result: "働", level: "N4" },
+  { hen: "亻", tsukuri: "也", result: "他", level: "N4" },
+  { hen: "亻", tsukuri: "更", result: "便", level: "N4" },
+  { hen: "女", tsukuri: "子", result: "好", level: "N4" },
+  { hen: "者", tsukuri: "阝", result: "都", level: "N4" },
+  { hen: "阝", tsukuri: "完", result: "院", level: "N4" },
+  { hen: "口", tsukuri: "未", result: "味", level: "N4" },
+  { hen: "氵", tsukuri: "先", result: "洗", level: "N4" },
+  { hen: "氵", tsukuri: "永", result: "泳", level: "N4" },
+  { hen: "氵", tsukuri: "也", result: "池", level: "N4" },
+  { hen: "木", tsukuri: "寸", result: "村", level: "N4" },
+  { hen: "木", tsukuri: "黄", result: "横", level: "N4" },
+  { hen: "日", tsukuri: "青", result: "晴", level: "N4" },
+  { hen: "日", tsukuri: "音", result: "暗", level: "N4" },
+  { hen: "日", tsukuri: "免", result: "晩", level: "N4" },
+  { hen: "日", tsukuri: "乍", result: "昨", level: "N4" },
+  { hen: "忄", tsukuri: "亡", result: "忙", level: "N4" },
+  { hen: "車", tsukuri: "云", result: "転", level: "N4" },
+  { hen: "扌", tsukuri: "帚", result: "掃", level: "N4" },
+  { hen: "礻", tsukuri: "申", result: "神", level: "N4" },
+  { hen: "禾", tsukuri: "斗", result: "科", level: "N4" },
 ];

@@ -8,6 +8,14 @@ interface RadicalGameProps {
   filter: KanjiFilter;
 }
 
+type LevelChoice = "N5" | "N4" | "all";
+
+const LEVEL_OPTIONS: Array<{ value: LevelChoice; label: string }> = [
+  { value: "N5", label: "N5" },
+  { value: "N4", label: "N4" },
+  { value: "all", label: "Cả hai" },
+];
+
 const TOTAL_ROUNDS = 5;
 const FALL_DURATION_MS = 6200;
 const MAX_CANDIDATES = 6;
@@ -64,12 +72,16 @@ function buildRound(combos: RadicalCombo[]): RoundData | null {
 }
 
 export default function RadicalGame({ filter }: RadicalGameProps) {
+  const [levelChoice, setLevelChoice] = useState<LevelChoice>(
+    filter.level === "N5" || filter.level === "N4" ? filter.level : "all"
+  );
+
   const combos = useMemo(() => {
-    if (filter.level === "N5" || filter.level === "N4") {
-      return RADICAL_COMBOS.filter((c) => c.level === filter.level);
+    if (levelChoice === "N5" || levelChoice === "N4") {
+      return RADICAL_COMBOS.filter((c) => c.level === levelChoice);
     }
     return RADICAL_COMBOS;
-  }, [filter.level]);
+  }, [levelChoice]);
 
   const [round, setRound] = useState(1);
   const [score, setScore] = useState(0);
@@ -160,36 +172,66 @@ export default function RadicalGame({ filter }: RadicalGameProps) {
     startRound();
   }
 
+  const levelSelector = (
+    <div className="mb-3 flex justify-center">
+      <div className="flex rounded-full bg-sand-200 p-1 shadow-inner">
+        {LEVEL_OPTIONS.map((opt) => (
+          <button
+            key={opt.value}
+            type="button"
+            onClick={() => setLevelChoice(opt.value)}
+            className={`btn-press rounded-full px-4 py-1.5 text-sm font-semibold transition-colors ${
+              levelChoice === opt.value
+                ? "bg-sand-600 text-sand-50 shadow"
+                : "text-sand-600 hover:bg-sand-300/70"
+            }`}
+          >
+            {opt.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+
   if (combos.length === 0) {
     return (
-      <div className="mx-auto max-w-md rounded-2xl border border-sand-300 bg-sand-50 p-8 text-center text-sand-600 shadow-card">
-        Không có bộ ghép bộ thủ nào phù hợp với bộ lọc hiện tại.
+      <div className="mx-auto w-full max-w-2xl">
+        {levelSelector}
+        <div className="mx-auto max-w-md rounded-2xl border border-sand-300 bg-sand-50 p-8 text-center text-sand-600 shadow-card">
+          Không có bộ ghép bộ thủ nào phù hợp với bộ lọc hiện tại.
+        </div>
       </div>
     );
   }
 
   if (phase === "summary") {
     return (
-      <div className="mx-auto max-w-md space-y-4 rounded-2xl border border-sand-300 bg-sand-50 p-8 text-center shadow-card">
-        <p className="text-lg font-semibold text-sand-700">Kết thúc phiên chơi!</p>
-        <p className="text-sand-600">
-          Bạn ghép đúng {score}/{TOTAL_ROUNDS} chữ Hán.
-        </p>
-        <button
-          type="button"
-          onClick={handleRestart}
-          className="btn-press rounded-full bg-sand-600 px-5 py-2 text-sm font-semibold text-sand-50 hover:brightness-95"
-        >
-          Chơi lại
-        </button>
+      <div className="mx-auto w-full max-w-2xl">
+        {levelSelector}
+        <div className="mx-auto max-w-md space-y-4 rounded-2xl border border-sand-300 bg-sand-50 p-8 text-center shadow-card">
+          <p className="text-lg font-semibold text-sand-700">Kết thúc phiên chơi!</p>
+          <p className="text-sand-600">
+            Bạn ghép đúng {score}/{TOTAL_ROUNDS} chữ Hán.
+          </p>
+          <button
+            type="button"
+            onClick={handleRestart}
+            className="btn-press rounded-full bg-sand-600 px-5 py-2 text-sm font-semibold text-sand-50 hover:brightness-95"
+          >
+            Chơi lại
+          </button>
+        </div>
       </div>
     );
   }
 
   if (!roundData) {
     return (
-      <div className="mx-auto max-w-md rounded-2xl border border-sand-300 bg-sand-50 p-8 text-center text-sand-600 shadow-card">
-        Đang chuẩn bị…
+      <div className="mx-auto w-full max-w-2xl">
+        {levelSelector}
+        <div className="mx-auto max-w-md rounded-2xl border border-sand-300 bg-sand-50 p-8 text-center text-sand-600 shadow-card">
+          Đang chuẩn bị…
+        </div>
       </div>
     );
   }
@@ -199,6 +241,7 @@ export default function RadicalGame({ filter }: RadicalGameProps) {
 
   return (
     <div className="mx-auto w-full max-w-2xl">
+      {levelSelector}
       <div className="mb-3 flex items-center justify-between text-sm text-sand-600">
         <span>
           Vòng {round}/{TOTAL_ROUNDS}
