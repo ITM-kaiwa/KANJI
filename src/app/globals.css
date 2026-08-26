@@ -46,3 +46,12 @@ body {
 .btn-press:active {
   transform: scale(0.94);
 }
+
+/* Review-reminder bell (ReviewBell.tsx) -- rings while reviews are due. */
+@keyframes wiggle {
+  0%, 100% { transform: rotate(-10deg); }
+  50% { transform: rotate(10deg); }
+}
+.animate-wiggle {
+  animation: wiggle 0.5s ease-in-out infinite;
+}

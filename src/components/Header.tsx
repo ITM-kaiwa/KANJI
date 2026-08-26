@@ -1,6 +1,7 @@
 "use client";
 
 import type { AppMode } from "@/lib/types";
+import ReviewBell from "./ReviewBell";
 
 interface HeaderProps {
   mode: AppMode;
@@ -17,6 +18,7 @@ export default function Header({ mode, onModeChange, onOpenSettings, onShuffle }
         <span className="text-sm font-medium tracking-wide text-sand-600">
           日本語フラッシュカード
         </span>
+        <ReviewBell />
 
         <div className="flex rounded-full bg-sand-200 p-1 shadow-inner">
           <button
