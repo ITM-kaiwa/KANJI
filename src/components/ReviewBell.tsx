@@ -3,15 +3,27 @@
 import { useEffect, useRef, useState } from "react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabaseClient";
 import { getDeviceId } from "@/lib/deviceId";
+import { CATEGORY_LABELS, type ContentCategory } from "@/lib/types";
+
+interface ReviewBellProps {
+  onJumpToCategory: (category: ContentCategory) => void;
+}
 
 type ContentType = "kanji" | "hiragana" | "katakana" | "vocab";
 
-const TYPE_LABELS: Record<ContentType, string> = {
-  kanji: "Kanji (漢字)",
+const TYPE_FALLBACK_LABELS: Record<ContentType, string> = {
+  kanji: "Kanji (漢字, chưa rõ danh mục)",
   hiragana: "Hiragana (ひらがな)",
   katakana: "Katakana (カタカナ)",
-  vocab: "Từ vựng (単語)",
+  vocab: "Từ vựng (単語, chưa rõ danh mục)",
 };
+
+interface Group {
+  /** null for rows recorded before the `category` column existed. */
+  category: ContentCategory | null;
+  contentType: ContentType;
+  count: number;
+}
 
 /**
  * Review-due bell shown next to the app title. Fetches this device's
@@ -22,14 +34,16 @@ const TYPE_LABELS: Record<ContentType, string> = {
  * table: everything here is computed live from review_state on load,
  * matching the "no login, no delivery channel" constraints already
  * established for this app's SRS.
+ *
+ * Grouped by the precise `category` column (not just the coarser
+ * content_type) so each row can jump straight to that category's flashcard
+ * screen -- content_type alone can't do that for "kanji"/"vocab" since
+ * several category tables share independent id sequences. Rows written
+ * before `category` existed fall back to a content_type-only group that
+ * isn't clickable.
  */
-export default function ReviewBell() {
-  const [counts, setCounts] = useState<Record<ContentType, number>>({
-    kanji: 0,
-    hiragana: 0,
-    katakana: 0,
-    vocab: 0,
-  });
+export default function ReviewBell({ onJumpToCategory }: ReviewBellProps) {
+  const [groups, setGroups] = useState<Group[]>([]);
   const [open, setOpen] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
 
@@ -39,19 +53,41 @@ export default function ReviewBell() {
       const deviceId = getDeviceId();
       if (!deviceId) return;
 
-      const { data } = await supabase
+      let { data, error } = await supabase
         .from("review_state")
-        .select("content_type")
+        .select("content_type, category")
         .eq("device_id", deviceId)
         .neq("status", "mastered")
         .lte("next_review", new Date().toISOString());
 
-      if (!data) return;
-      const next: Record<ContentType, number> = { kanji: 0, hiragana: 0, katakana: 0, vocab: 0 };
-      for (const row of data as Array<{ content_type: string }>) {
-        if (row.content_type in next) next[row.content_type as ContentType]++;
+      // Tolerate add_review_category_column.sql not having been run yet.
+      if (error?.code === "PGRST204" || error?.message?.includes("category")) {
+        const fallback = await supabase
+          .from("review_state")
+          .select("content_type")
+          .eq("device_id", deviceId)
+          .neq("status", "mastered")
+          .lte("next_review", new Date().toISOString());
+        data = fallback.data?.map((row) => ({ ...row, category: null })) ?? null;
       }
-      setCounts(next);
+
+      if (!data) return;
+
+      const counts = new Map<string, Group>();
+      for (const row of data as Array<{ content_type: ContentType; category: string | null }>) {
+        const key = row.category ?? `_type:${row.content_type}`;
+        const existing = counts.get(key);
+        if (existing) {
+          existing.count++;
+        } else {
+          counts.set(key, {
+            category: (row.category as ContentCategory | null) ?? null,
+            contentType: row.content_type,
+            count: 1,
+          });
+        }
+      }
+      setGroups(Array.from(counts.values()).sort((a, b) => b.count - a.count));
     }
 
     load();
@@ -67,8 +103,13 @@ export default function ReviewBell() {
     return () => document.removeEventListener("mousedown", handleOutsideClick);
   }, []);
 
-  const total = counts.kanji + counts.hiragana + counts.katakana + counts.vocab;
-  const rows = (Object.keys(TYPE_LABELS) as ContentType[]).filter((type) => counts[type] > 0);
+  const total = groups.reduce((sum, g) => sum + g.count, 0);
+
+  function handleRowClick(group: Group) {
+    if (!group.category) return;
+    onJumpToCategory(group.category);
+    setOpen(false);
+  }
 
   return (
     <div className="relative" ref={panelRef}>
@@ -99,16 +140,30 @@ export default function ReviewBell() {
               </p>
             ) : (
               <div className="divide-y divide-sand-100">
-                {rows.map((type) => (
-                  <div key={type} className="flex items-center justify-between px-4 py-2.5 text-sm">
-                    <span className="text-sand-700">{TYPE_LABELS[type]}</span>
-                    <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-bold text-amber-700">
-                      {counts[type]}
-                    </span>
-                  </div>
-                ))}
+                {groups.map((group) => {
+                  const label = group.category
+                    ? CATEGORY_LABELS[group.category]
+                    : TYPE_FALLBACK_LABELS[group.contentType];
+                  const clickable = Boolean(group.category);
+                  return (
+                    <button
+                      key={group.category ?? `_type:${group.contentType}`}
+                      type="button"
+                      disabled={!clickable}
+                      onClick={() => handleRowClick(group)}
+                      className={`flex w-full items-center justify-between px-4 py-2.5 text-left text-sm ${
+                        clickable ? "hover:bg-sand-100" : "cursor-default opacity-70"
+                      }`}
+                    >
+                      <span className="text-sand-700">{label}</span>
+                      <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-bold text-amber-700">
+                        {group.count}
+                      </span>
+                    </button>
+                  );
+                })}
                 <div className="px-4 py-2.5 text-xs text-sand-500">
-                  Mở danh mục tương ứng trong Cài đặt để ôn tập.
+                  Nhấn vào một danh mục để bắt đầu ôn tập.
                 </div>
               </div>
             )}

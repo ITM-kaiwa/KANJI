@@ -104,6 +104,27 @@ export const DEFAULT_FILTER: KanjiFilter = {
   level: "N5",
 };
 
+/** Display label per category, shared by SettingsModal's pills and
+ * ReviewBell's due-review breakdown so a category always shows the same
+ * name everywhere. */
+export const CATEGORY_LABELS: Record<ContentCategory, string> = {
+  hiragana: "ひらがな",
+  katakana: "カタカナ",
+  "vocab-n5": "単語 N5",
+  "vocab-n4": "単語 N4",
+  N5: "漢字 N5",
+  N4: "漢字 N4",
+  N3: "漢字 N3",
+  "minna-kanji": "みん漢字",
+  "irodori-nyumon": "いろ入門",
+  "irodori-shokyu1": "いろ初級1",
+  "irodori-shokyu2": "いろ初級2",
+  "irodori-kanji-nyumon": "いろ漢-入門",
+  "irodori-kanji-shokyu1": "いろ漢-初級1",
+  "irodori-kanji-shokyu2": "いろ漢-初級2",
+  "irodori-kanji-shochukyu": "いろ漢-初中級",
+};
+
 export function isKanaCategory(level: ContentCategory): level is KanaType {
   return level === "hiragana" || level === "katakana";
 }

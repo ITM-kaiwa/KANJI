@@ -150,6 +150,12 @@ export default function HomePage() {
     setCardIndex(0);
   }
 
+  function handleJumpToCategory(category: KanjiFilter["level"]) {
+    setFilter({ level: category });
+    setCardIndex(0);
+    setMode("flashcard");
+  }
+
   function handleShuffle() {
     setOrder((prev) => shuffle(prev.length ? prev : prioritized.map((_, i) => i)));
     setCardIndex(0);
@@ -168,7 +174,7 @@ export default function HomePage() {
       currentKanji ?? currentKana ?? currentVocab ?? currentIrodoriKanji ?? currentMinnaKanji;
     if (!current) return;
     const deviceId = getDeviceId();
-    await processReview(deviceId, contentType, String(current.id), isCorrect);
+    await processReview(deviceId, contentType, String(current.id), isCorrect, filter.level);
     goNext();
   }
 
@@ -179,6 +185,7 @@ export default function HomePage() {
         onModeChange={setMode}
         onOpenSettings={() => setSettingsOpen(true)}
         onShuffle={handleShuffle}
+        onJumpToCategory={handleJumpToCategory}
       />
 
       <main className="flex flex-1 flex-col items-center justify-center gap-4 px-4 py-8">

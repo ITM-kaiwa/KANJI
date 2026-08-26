@@ -87,7 +87,13 @@ export async function processReview(
   deviceId: string,
   contentType: ReviewContentType,
   contentId: string,
-  isCorrect: boolean
+  isCorrect: boolean,
+  /** The precise ContentCategory (e.g. "N5", "minna-kanji", "irodori-nyumon")
+   * at time of review. content_type alone is too coarse to know which of
+   * several category tables a "kanji"/"vocab" row's content_id came from
+   * (each has its own independent id sequence) -- category is what lets the
+   * review-due bell jump straight to the right one. */
+  category: string
 ): Promise<void> {
   if (!isSupabaseConfigured || !supabase || !deviceId) return;
 
@@ -100,14 +106,23 @@ export async function processReview(
     .maybeSingle();
 
   const nextRecord = calculateNextReview(existing, isCorrect);
+  const basePayload = {
+    device_id: deviceId,
+    content_type: contentType,
+    content_id: contentId,
+    ...nextRecord,
+  };
 
-  await supabase.from("review_state").upsert(
-    {
-      device_id: deviceId,
-      content_type: contentType,
-      content_id: contentId,
-      ...nextRecord,
-    },
-    { onConflict: "device_id,content_type,content_id" }
-  );
+  const { error } = await supabase
+    .from("review_state")
+    .upsert({ ...basePayload, category }, { onConflict: "device_id,content_type,content_id" });
+
+  // Tolerate add_review_category_column.sql not having been run yet, so a
+  // code deploy landing before that migration doesn't break review
+  // recording entirely -- retry once without `category`.
+  if (error?.code === "PGRST204" || error?.message?.includes("category")) {
+    await supabase
+      .from("review_state")
+      .upsert(basePayload, { onConflict: "device_id,content_type,content_id" });
+  }
 }

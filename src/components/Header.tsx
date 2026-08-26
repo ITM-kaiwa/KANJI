@@ -1,6 +1,6 @@
 "use client";
 
-import type { AppMode } from "@/lib/types";
+import type { AppMode, ContentCategory } from "@/lib/types";
 import ReviewBell from "./ReviewBell";
 
 interface HeaderProps {
@@ -8,9 +8,16 @@ interface HeaderProps {
   onModeChange: (mode: AppMode) => void;
   onOpenSettings: () => void;
   onShuffle: () => void;
+  onJumpToCategory: (category: ContentCategory) => void;
 }
 
-export default function Header({ mode, onModeChange, onOpenSettings, onShuffle }: HeaderProps) {
+export default function Header({
+  mode,
+  onModeChange,
+  onOpenSettings,
+  onShuffle,
+  onJumpToCategory,
+}: HeaderProps) {
   return (
     <header className="flex flex-wrap items-center justify-between gap-3 px-4 pt-6 sm:px-8">
       <div className="flex flex-wrap items-center gap-3">
@@ -18,7 +25,7 @@ export default function Header({ mode, onModeChange, onOpenSettings, onShuffle }
         <span className="text-sm font-medium tracking-wide text-sand-600">
           日本語フラッシュカード
         </span>
-        <ReviewBell />
+        <ReviewBell onJumpToCategory={onJumpToCategory} />
 
         <div className="flex rounded-full bg-sand-200 p-1 shadow-inner">
           <button
