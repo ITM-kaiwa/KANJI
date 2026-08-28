@@ -19,6 +19,7 @@ const LEVEL_OPTIONS: Array<{ value: LevelChoice; label: string }> = [
 const TOTAL_ROUNDS = 5;
 const FALL_DURATION_MS = 7400;
 const MAX_CANDIDATES = 6;
+const ROTATION_STEP = 90;
 
 type Role = "hen" | "tsukuri";
 
@@ -32,7 +33,11 @@ interface RoundData {
 interface ResultInfo {
   success: boolean;
   resultChar: string | null;
-  timedOut: boolean;
+}
+
+function randomInitialRotation(): number {
+  // Never start upright (0deg) so every candidate needs at least one click.
+  return ROTATION_STEP * (1 + Math.floor(Math.random() * 3));
 }
 
 function shuffle<T>(arr: T[]): T[] {
@@ -91,11 +96,13 @@ export default function RadicalGame({ filter }: RadicalGameProps) {
   const [fallTop, setFallTop] = useState(0);
   const [fallLeft, setFallLeft] = useState(0);
   const [fallRotation, setFallRotation] = useState(0);
+  const [candidateRotations, setCandidateRotations] = useState<number[]>([]);
 
   const rafRef = useRef<number | null>(null);
   const startRef = useRef<number>(0);
   const settledRef = useRef(false);
   const rotationTargetRef = useRef(0);
+  const candidateRotationsRef = useRef<number[]>([]);
 
   const startFall = useCallback(() => {
     settledRef.current = false;
@@ -117,7 +124,7 @@ export default function RadicalGame({ filter }: RadicalGameProps) {
       if (progress >= 1) {
         if (!settledRef.current) {
           settledRef.current = true;
-          setResult({ success: false, resultChar: null, timedOut: true });
+          setResult({ success: false, resultChar: null });
           setPhase("result");
         }
         return;
@@ -132,6 +139,9 @@ export default function RadicalGame({ filter }: RadicalGameProps) {
     setRoundData(data);
     setResult(null);
     setPhase("falling");
+    const initialRotations = data ? data.candidates.map(() => randomInitialRotation()) : [];
+    candidateRotationsRef.current = initialRotations;
+    setCandidateRotations(initialRotations);
     if (data) startFall();
   }, [combos, startFall]);
 
@@ -146,22 +156,28 @@ export default function RadicalGame({ filter }: RadicalGameProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [combos]);
 
-  function handleCatch(candidate: string) {
+  function handleCandidateClick(candidate: string, index: number) {
     if (phase !== "falling" || !roundData || settledRef.current) return;
-    settledRef.current = true;
-    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+
+    const newRotation = (candidateRotationsRef.current[index] + ROTATION_STEP) % 360;
+    candidateRotationsRef.current = candidateRotationsRef.current.map((r, i) =>
+      i === index ? newRotation : r
+    );
+    setCandidateRotations(candidateRotationsRef.current);
 
     const match = roundData.matchingCombos.find((c) =>
       roundData.role === "hen" ? c.tsukuri === candidate : c.hen === candidate
     );
 
-    if (match) {
+    // Only landing the correct card upright (0deg) ends the round -- wrong
+    // cards just spin harmlessly, and time pressure still comes from the fall.
+    if (match && newRotation === 0) {
+      settledRef.current = true;
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
       setScore((s) => s + 1);
-      setResult({ success: true, resultChar: match.result, timedOut: false });
-    } else {
-      setResult({ success: false, resultChar: null, timedOut: false });
+      setResult({ success: true, resultChar: match.result });
+      setPhase("result");
     }
-    setPhase("result");
   }
 
   function handleNext() {
@@ -197,6 +213,16 @@ export default function RadicalGame({ filter }: RadicalGameProps) {
           </button>
         ))}
       </div>
+    </div>
+  );
+
+  const instructions = (
+    <div className="mx-auto mb-4 max-w-xl rounded-xl border border-dashed border-leaf-400/70 bg-leaf-100/40 p-3 text-xs leading-relaxed text-sand-700">
+      <span className="font-bold text-leaf-500">Cách chơi: </span>
+      Một bộ phận chữ Hán sẽ rơi xuống từ trên cao. Trong các thẻ đang chờ bên cạnh, hãy tìm thẻ
+      ghép đúng với nó để tạo thành một chữ Hán có nghĩa. Mỗi lần nhấn vào thẻ đó, thẻ sẽ xoay theo
+      chiều kim đồng hồ — khi thẻ xoay về đúng chiều (thẳng đứng) thì câu trả lời được tính là
+      đúng. Hãy nhanh tay trước khi thẻ rơi hết nhé!
     </div>
   );
 
@@ -249,6 +275,7 @@ export default function RadicalGame({ filter }: RadicalGameProps) {
   return (
     <div className="mx-auto w-full max-w-2xl">
       {levelSelector}
+      {instructions}
       <div className="mb-3 flex items-center justify-between text-sm text-sand-600">
         <span>
           Vòng {round}/{TOTAL_ROUNDS}
@@ -280,7 +307,7 @@ export default function RadicalGame({ filter }: RadicalGameProps) {
         {/* Candidate stock (right side) */}
         <div className="flex flex-1 flex-col gap-2">
           <p className="text-center text-[11px] font-medium text-sand-600 sm:text-left">
-            {candidateLabel} — nhấn thật nhanh trước khi thẻ rơi hết!
+            {candidateLabel} — nhấn vào thẻ đúng để xoay nó về đúng chiều!
           </p>
           <div className="grid grid-cols-3 gap-2 sm:grid-cols-3">
             {roundData.candidates.map((candidate, i) => (
@@ -288,8 +315,12 @@ export default function RadicalGame({ filter }: RadicalGameProps) {
                 key={`${candidate}-${i}`}
                 type="button"
                 disabled={phase !== "falling"}
-                onClick={() => handleCatch(candidate)}
-                className="btn-press flex h-16 items-center justify-center rounded-xl border border-leaf-300 bg-leaf-100 font-kyokasho text-2xl text-kanjibrown shadow hover:bg-leaf-200 hover:brightness-95 disabled:opacity-60"
+                onClick={() => handleCandidateClick(candidate, i)}
+                style={{
+                  transform: `rotate(${candidateRotations[i] ?? 0}deg)`,
+                  transition: "transform 0.2s ease-out",
+                }}
+                className="btn-press flex aspect-square w-full items-center justify-center rounded-xl border border-leaf-300 bg-leaf-100 font-kyokasho text-2xl text-kanjibrown shadow hover:bg-leaf-200 hover:brightness-95 disabled:opacity-60"
               >
                 {candidate}
               </button>
@@ -304,15 +335,13 @@ export default function RadicalGame({ filter }: RadicalGameProps) {
                   : "border-red-300 bg-red-50 text-red-700"
               }`}
             >
-              {result.timedOut && <p className="font-semibold">Hết giờ — thẻ đã rơi mất!</p>}
-              {!result.timedOut && result.success && (
+              {result.success ? (
                 <p className="font-semibold">
                   Chính xác! Ghép thành công chữ{" "}
                   <span className="font-kyokasho text-lg">{result.resultChar}</span>
                 </p>
-              )}
-              {!result.timedOut && !result.success && (
-                <p className="font-semibold">Chưa đúng — sự kết hợp này không tạo thành chữ Hán.</p>
+              ) : (
+                <p className="font-semibold">Hết giờ — thẻ đã rơi mất!</p>
               )}
               <button
                 type="button"
