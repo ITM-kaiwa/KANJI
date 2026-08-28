@@ -17,7 +17,7 @@ const LEVEL_OPTIONS: Array<{ value: LevelChoice; label: string }> = [
 ];
 
 const TOTAL_ROUNDS = 5;
-const FALL_DURATION_MS = 6200;
+const FALL_DURATION_MS = 7400;
 const MAX_CANDIDATES = 6;
 
 type Role = "hen" | "tsukuri";
@@ -90,22 +90,29 @@ export default function RadicalGame({ filter }: RadicalGameProps) {
   const [result, setResult] = useState<ResultInfo | null>(null);
   const [fallTop, setFallTop] = useState(0);
   const [fallLeft, setFallLeft] = useState(0);
+  const [fallRotation, setFallRotation] = useState(0);
 
   const rafRef = useRef<number | null>(null);
   const startRef = useRef<number>(0);
   const settledRef = useRef(false);
+  const rotationTargetRef = useRef(0);
 
   const startFall = useCallback(() => {
     settledRef.current = false;
     setFallTop(0);
     setFallLeft(0);
+    setFallRotation(0);
     startRef.current = performance.now();
+    // Randomize spin direction and total turns for this card so each drop feels different.
+    const spinDir = Math.random() < 0.5 ? -1 : 1;
+    rotationTargetRef.current = spinDir * (360 + Math.random() * 720);
 
     function tick(now: number) {
       const elapsed = now - startRef.current;
       const progress = Math.min(elapsed / FALL_DURATION_MS, 1);
       setFallTop(progress * 86);
       setFallLeft(Math.sin(progress * Math.PI * 4) * 26);
+      setFallRotation(progress * rotationTargetRef.current);
 
       if (progress >= 1) {
         if (!settledRef.current) {
@@ -260,6 +267,7 @@ export default function RadicalGame({ filter }: RadicalGameProps) {
             style={{
               top: `${fallTop}%`,
               left: `calc(50% - 2rem + ${fallLeft}px)`,
+              transform: `rotate(${fallRotation}deg)`,
               transition: phase === "falling" ? "none" : "top 0.2s ease-out",
             }}
           >
