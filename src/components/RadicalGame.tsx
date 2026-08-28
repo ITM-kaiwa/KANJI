@@ -91,7 +91,7 @@ export default function RadicalGame({ filter }: RadicalGameProps) {
   const [round, setRound] = useState(1);
   const [score, setScore] = useState(0);
   const [roundData, setRoundData] = useState<RoundData | null>(null);
-  const [phase, setPhase] = useState<"falling" | "result" | "summary">("falling");
+  const [phase, setPhase] = useState<"waiting" | "falling" | "result" | "summary">("waiting");
   const [result, setResult] = useState<ResultInfo | null>(null);
   const [fallTop, setFallTop] = useState(0);
   const [fallLeft, setFallLeft] = useState(0);
@@ -138,12 +138,21 @@ export default function RadicalGame({ filter }: RadicalGameProps) {
     const data = buildRound(combos);
     setRoundData(data);
     setResult(null);
-    setPhase("falling");
+    setFallTop(0);
+    setFallLeft(0);
+    setFallRotation(0);
+    // Wait for the player to press Start before the card actually falls.
+    setPhase(data ? "waiting" : "falling");
     const initialRotations = data ? data.candidates.map(() => randomInitialRotation()) : [];
     candidateRotationsRef.current = initialRotations;
     setCandidateRotations(initialRotations);
-    if (data) startFall();
-  }, [combos, startFall]);
+  }, [combos]);
+
+  function handleStart() {
+    if (phase !== "waiting" || !roundData) return;
+    setPhase("falling");
+    startFall();
+  }
 
   // (Re)start the session whenever the eligible combo pool changes.
   useEffect(() => {
@@ -227,6 +236,17 @@ export default function RadicalGame({ filter }: RadicalGameProps) {
       ghép đúng với nó để tạo thành một chữ Hán có nghĩa. Mỗi lần nhấn vào thẻ đó, thẻ sẽ xoay theo
       chiều kim đồng hồ — khi thẻ xoay về đúng chiều (thẳng đứng) thì câu trả lời được tính là
       đúng. Hãy nhanh tay trước khi thẻ rơi hết nhé!
+      {phase === "waiting" && (
+        <div className="mt-2 flex justify-center">
+          <button
+            type="button"
+            onClick={handleStart}
+            className="btn-press rounded-full bg-sand-600 px-5 py-1.5 text-xs font-bold text-sand-50 shadow hover:brightness-95"
+          >
+            ▶ Bắt đầu
+          </button>
+        </div>
+      )}
     </div>
   );
 
