@@ -159,7 +159,10 @@ export default function RadicalGame({ filter }: RadicalGameProps) {
   function handleCandidateClick(candidate: string, index: number) {
     if (phase !== "falling" || !roundData || settledRef.current) return;
 
-    const newRotation = (candidateRotationsRef.current[index] + ROTATION_STEP) % 360;
+    // Keep accumulating (never wrap with %) so the CSS transition always turns
+    // a clean +90deg clockwise -- wrapping the stored value back to a small
+    // number made the transition spin the long way round instead.
+    const newRotation = candidateRotationsRef.current[index] + ROTATION_STEP;
     candidateRotationsRef.current = candidateRotationsRef.current.map((r, i) =>
       i === index ? newRotation : r
     );
@@ -169,9 +172,10 @@ export default function RadicalGame({ filter }: RadicalGameProps) {
       roundData.role === "hen" ? c.tsukuri === candidate : c.hen === candidate
     );
 
-    // Only landing the correct card upright (0deg) ends the round -- wrong
-    // cards just spin harmlessly, and time pressure still comes from the fall.
-    if (match && newRotation === 0) {
+    // Only landing the correct card upright (a multiple of 360deg) ends the
+    // round -- wrong cards just spin harmlessly, and time pressure still
+    // comes from the fall.
+    if (match && newRotation % 360 === 0) {
       settledRef.current = true;
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       setScore((s) => s + 1);
